@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Battleship Matchmaking</title>
+  <link rel="stylesheet" href="style_mach.css">
+</head>
+<body>
+
+    <header>
+        <h1>BATTLESHIP</h1>
+    </header>
+
+    <div class="board-container">
+        <div id="matchmaking-board" class="board"></div>
+    </div>
+
+    <div class="control-bar">
+        <input type="text" id="room-id" placeholder="Enter Room ID" />
+        <button id="join-room" onclick="join_room()">Join Room</button>
+        <button id="create-room" onclick="create_room()">Create Room</button>
+    </div>
+    <div class="warning_bar" id="warning_bar"></div>
+
+
+  <script src="/socket.io/socket.io.min.js"></script>
+  <script src="script_match.js"></script>
+</body>
+</html>

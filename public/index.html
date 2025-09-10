@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BATTLESHIP</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>BATTLESHIP</h1>
+  </header>
+
+  <main class="boards">
+    <!-- Your Board -->
+    <section class="board">
+      <h2>Your Board</h2>
+      <div class="grid" id="your-board">
+      </div>
+    </section>
+
+    <!-- Opponent Board -->
+    <section class="board">
+      <h2>Opponent Board</h2>
+      <div class="grid" id="opponent-board">
+      </div>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.min.js"></script>
+  <script src = 'script.js'></script>
+</body>
+</html>

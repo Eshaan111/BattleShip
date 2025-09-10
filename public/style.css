@@ -1,0 +1,89 @@
+:root {
+  --bg: #0e1014;
+  --panel: #151922;
+  --grid-bg: #2a3140;
+  --grid-hover: #3a4357;
+  --text: #e8edf7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  margin: 1rem 0;
+  letter-spacing: 0.1em;
+}
+
+.boards {
+  display: grid;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px; /* prevent stretching too wide */
+}
+
+@media (min-width: 900px) {
+  .boards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.board {
+  background: var(--panel);
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.board h2 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+/* Grid: 15x15 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 2px;
+  width: 95%;          /* scale relative to parent */
+  aspect-ratio: 1 / 1; /* keep square */
+  max-width: 550px;    /* prevents cells from being too small */
+  margin: 0 auto;
+}
+
+.cell {
+  background: var(--grid-bg);
+  border-radius: 2px;
+  aspect-ratio: 1/1;
+  transition: background 0.2s;
+}
+
+.cell:hover {
+  background: var(--grid-hover);
+}
+
+.clicked_cell {
+  background-color: red;  /* or any color you want */
+  border: 2px solid darkred;
+}
+
+.clicked_cell:hover {
+  background-color: red;  /* keep same color */
+}
