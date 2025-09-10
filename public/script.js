@@ -7,6 +7,11 @@ socket.on('confirm1',data=>{
 const params = new URLSearchParams(window.location.search);
 const room_id = params.get('room')
 
+client_cells = document.getElementsByClassName('cell-your-board')
+opponent_cells = document.getElementsByClassName(`cell-opponent-board`)
+warning_bar = document.getElementById('warning_bar')
+console.log(warning_bar)
+
 const row = 15;
 const col = 15;
 
@@ -14,6 +19,7 @@ const col = 15;
 function build_board(board_name){
   for(var i =0;i<row;i++){
     for(var j =0;j<col;j++){
+
       const cell = document.createElement('div')
       var parent = document.getElementById(board_name)
       cell.classList.add('cell')
@@ -22,13 +28,15 @@ function build_board(board_name){
       parent.appendChild(cell)
 
       cell.onclick= function(){
+        warning_bar.style.display = 'none'
+        var index = this.dataset.index
         var classes = Array.from(this.classList)
+        
         if(classes.includes('cell-opponent-board')){
-          var index = this.dataset.index
-          console.log(client_cells[index])
-          this.classList.add('clicked_cell')
-
+          
+          //////CELL CLICK REQ////
           socket.emit('cell_clicked',index)
+          window.lastClickedCell = this;
         }
       }
     }
@@ -39,13 +47,34 @@ function build_board(board_name){
 build_board('your-board')
 build_board('opponent-board')
 
-client_cells = document.getElementsByClassName('cell-your-board')
-opponent_cells = document.getElementsByClassName(`cell-opponent-board`)
-
 console.log(client_cells)
 
 socket.on('opponent_clicked_cell',index=>{
+  //updates your board when opponent chooses your cell
   client_cells[index].classList.add('clicked_cell')
 })
 
-socket.emit('create-room',room_id)
+socket.on('player-alone',bool=>{
+  if(bool){
+    warning_bar.innerText = 'OPPONENT NOT CONNECTED'
+    warning_bar.style.display= 'block'
+  }
+  
+})
+
+socket.on('turn-evaluation', bool => {
+  if (!bool) {
+    warning_bar.innerText = 'NOT YOUR TURN';
+    warning_bar.style.display = 'block';
+  } else {
+    console.log('reaching');
+    if (window.lastClickedCell) {
+      //update's opponent board ono your screen when you choose a opponent cell
+      window.lastClickedCell.classList.add('clicked_cell');
+      socket.emit('print-players', room_id);
+    }
+  }
+})
+
+
+socket.emit('enter-room',room_id)

@@ -63,7 +63,7 @@ function join_room(){
     })
         //confiramtion
     socketio.on('change-to-game',room_id=>{
-        window.location.href=`index.html?room=${room_id}` //then socket.emit('join-room') in script.js
+        window.location.href=`index.html?room=${room_id}` //then socket.emit('enter-room') in script.js
     })
     
 

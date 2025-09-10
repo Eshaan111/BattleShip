@@ -5,7 +5,7 @@ const expressServer = app.listen(4000)
 const io = socketio(expressServer,{})
 
 players= {
-    // socket_id : {playerNum : <player's number>, room_id= <room id joined>} 
+    // socket_id : {playerNum : <player's number>, room_id= <room id joined>, is_turn = 0/1} 
 }
 app.use(express.static('public'))
 
@@ -32,10 +32,17 @@ io.on('connect',socket=>{
         console.log('changing to game')
         socket.emit('change-to-game',room_id)
     })
-    socket.on('create-room',room_id=>{
+    socket.on('enter-room',room_id=>{
+        var room_player_count = 0;
+        for(id in players){
+            if(players[id].room_id == room_id){room_player_count++}
+        }
+        if(room_player_count==0){var turn = 1}
+        if(room_player_count == 1){var turn = 0}
+
         socket.join(room_id)
         player_count = Object.keys(players).length
-        players[socket.id] = {playerNum : player_count + 1, room_id: room_id}
+        players[socket.id] = {playerNum : player_count + 1, room_id: room_id, is_turn : turn}
         console.log(players)
     })
 
@@ -53,25 +60,63 @@ io.on('connect',socket=>{
 
 
     socket.on('cell_clicked',index=>{
-        //selecting opponent,socket.id == id of opponent who just clicked
-        console.log(players,socket.id,players[socket.id])
+
         var client_room_id = players[socket.id].room_id
+        var client_turn = players[socket.id].is_turn
+        var opponent_id = ''
+        //checking number of players in room
+        var room_player_count = 0;
+        for(id in players){
+            if(players[id].room_id == client_room_id){room_player_count++}
+        }
+
+        //check if opponent connected 
         
-        for(let id in players){
+        if(room_player_count<2){
+            socket.emit('player-alone',true);
+            return
+        }
+        else{
+            socket.emit('player-alone',false)
+        }
+        
+
+
+        //checking turn
+        
+        if(client_turn==1){
+            for(let id in players){
+                console.log('my id = ',client_room_id)
             if(players[id].room_id == client_room_id && id!==socket.id){
                 //updating opponent client's CLIENT BOARD
                 io.to(id).emit('opponent_clicked_cell',index)
+                opponent_id = id;
+                players[socket.id].is_turn = 0;
+                players[opponent_id].is_turn = 1;
+                }
             }
+            console.log('turn-eval-true')
+            socket.emit('turn-evaluation',true)
+            return
+        }
+        else{
+            console.log('turn-eval-false')
+            socket.emit('turn-evaluation',false)
+            return
         }
         
         
-         
-
+    
     })
 
+    socket.on('print-players',room_id=>{
+        console.log(players)
+    })
 
     socket.on('disconnect',(socket)=>{
         delete players[socket.id]
-        console.log(players)
+        console.log(`deleteing player ${socket.id}`,players)
     })
+
+
 })

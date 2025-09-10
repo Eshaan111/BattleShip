@@ -87,3 +87,19 @@ header h1 {
 .clicked_cell:hover {
   background-color: red;  /* keep same color */
 }
+
+
+
+.warning_bar {
+  display: none;
+  margin-top: 15px;
+  padding: 10px 15px;
+  text-align: center;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  background-color: #ff4d4d; /* red warning */
+  color: #fff;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
