@@ -51,17 +51,19 @@ function join_room(){
     input_box.value = '';    
     
     //////JOIN ROOM REQUEST////////
-    socketio.emit('join-room',room_id)
+    socketio.emit('join-room-req',room_id)
     socketio.on('room-doesnt-exist',room_id=>{
       warning_bar.innerText = 'Room Does Not Exist'
+      warning_bar.style.display = 'block';
       return
     })
     socketio.on('full-room',room_id=>{
       warning_bar.innerText = 'FULL ROOM, cant join'
+      warning_bar.style.display = 'block';
     })
         //confiramtion
-    socketio.on('join-room',room_id=>{
-      
+    socketio.on('change-to-game',room_id=>{
+        window.location.href=`index.html?room=${room_id}` //then socket.emit('join-room') in script.js
     })
     
 
@@ -89,8 +91,8 @@ function create_room(){
         return
     })
             //Confirmation
-    socketio.on('create-room',room_id=>{
-        window.location.href=`index.html?room=${room_id}`
+    socketio.on('change-to-game',room_id=>{
+        window.location.href=`index.html?room=${room_id}` //then socket.emit('create-room') in script.js
     })
     
     

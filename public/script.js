@@ -4,7 +4,8 @@ socket.emit('confirm','JS says this')
 socket.on('confirm1',data=>{
   console.log(data)
 })
-const ingame=false;
+const params = new URLSearchParams(window.location.search);
+const room_id = params.get('room')
 
 const row = 15;
 const col = 15;
@@ -46,3 +47,5 @@ console.log(client_cells)
 socket.on('opponent_clicked_cell',index=>{
   client_cells[index].classList.add('clicked_cell')
 })
+
+socket.emit('create-room',room_id)

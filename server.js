@@ -16,7 +16,7 @@ io.on('connect',socket=>{
     socket.on('confirm',data=>{
         console.log(data)
     })
-    socket.emit('confirm1','servers sauyst hits')
+    socket.emit('confirm1',`My id is =>>>> ${socket.id}`)
 
     ////////CREATING ROOM/////////////
     socket.on('create-room-req',room_id=>{
@@ -29,16 +29,34 @@ io.on('connect',socket=>{
 
             }
         }
+        console.log('changing to game')
+        socket.emit('change-to-game',room_id)
+    })
+    socket.on('create-room',room_id=>{
         socket.join(room_id)
         player_count = Object.keys(players).length
         players[socket.id] = {playerNum : player_count + 1, room_id: room_id}
         console.log(players)
-        socket.emit('create-room',room_id)
     })
+
+    ///JOINING ROOM///
+    socket.on('join-room-req',room_id=>{
+        var room_player_count = 0;
+        for(id in players){
+            if(players[id].room_id == room_id){room_player_count++}
+        }
+        if(room_player_count == 0 ){socket.emit('room-doesnt-exist',room_id); return}
+        if(room_player_count > 1 ){socket.emit('full-room',room_id);return}
+        if(room_player_count == 1 ){socket.emit('change-to-game',room_id)}
+
+    })
+
 
     socket.on('cell_clicked',index=>{
         //selecting opponent,socket.id == id of opponent who just clicked
-        client_room_id = players[socket.id].room_id
+        console.log(players,socket.id,players[socket.id])
+        var client_room_id = players[socket.id].room_id
+        
         for(let id in players){
             if(players[id].room_id == client_room_id && id!==socket.id){
                 //updating opponent client's CLIENT BOARD
@@ -54,5 +72,6 @@ io.on('connect',socket=>{
 
     socket.on('disconnect',(socket)=>{
         delete players[socket.id]
+        console.log(players)
     })
 })
