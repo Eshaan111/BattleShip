@@ -5,7 +5,7 @@ const expressServer = app.listen(4000)
 const io = socketio(expressServer,{})
 
 players= {
-    // socket_id : {playerNum : <player's number>, room_id= <room id joined>, is_turn = 0/1} 
+    // socket_id : {playerName : <player name>, playerNum : <player's number>, room_id= <room id joined>, is_turn = 0/1} 
 }
 app.use(express.static('public'))
 
@@ -32,7 +32,10 @@ io.on('connect',socket=>{
         console.log('changing to game')
         socket.emit('change-to-game',room_id)
     })
-    socket.on('enter-room',room_id=>{
+    socket.on('enter-room',data=>{
+        //data = [player_name,room_id]
+        const room_id = data[1]
+        var player_name = data[0] 
         var room_player_count = 0;
         for(id in players){
             if(players[id].room_id == room_id){room_player_count++}
@@ -42,7 +45,7 @@ io.on('connect',socket=>{
 
         socket.join(room_id)
         player_count = Object.keys(players).length
-        players[socket.id] = {playerNum : player_count + 1, room_id: room_id, is_turn : turn}
+        players[socket.id] = {playerName : player_name, playerNum : player_count + 1, room_id: room_id, is_turn : turn}
         console.log(players)
     })
 
@@ -113,7 +116,7 @@ io.on('connect',socket=>{
         console.log(players)
     })
 
-    socket.on('disconnect',(socket)=>{
+    socket.on('disconnect',()=>{
         delete players[socket.id]
         console.log(`deleteing player ${socket.id}`,players)
     })

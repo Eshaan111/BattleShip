@@ -17,10 +17,22 @@
 
     <div class="control-bar">
         <input type="text" id="room-id" placeholder="Enter Room ID" />
-        <button id="join-room" onclick="join_room()">Join Room</button>
-        <button id="create-room" onclick="create_room()">Create Room</button>
+        <button id="join-room" onclick="join_ask_name()">Join Room</button>
+        <button id="create-room" onclick="create_ask_name()">Create Room</button>
     </div>
-    <div class="warning_bar" id="warning_bar"></div>
+    
+
+    <div class="message_bar" id="message_bar">
+      <input 
+        type="text" 
+        id="name_input" 
+        placeholder="Joining as :" 
+        class="name_input"
+      />
+      <button id="create_btn" class="enter_btn" onclick="enter_room_create()" >Join</button>
+      <button id="join_btn" class="enter_btn" onclick="enter_room_join()" >Join</button>
+      <p id="message"></p>
+    </div>
 
 
   <script src="/socket.io/socket.io.min.js"></script>

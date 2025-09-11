@@ -6,11 +6,12 @@ socket.on('confirm1',data=>{
 })
 const params = new URLSearchParams(window.location.search);
 const room_id = params.get('room')
+const player_name = params.get('name')
 
 client_cells = document.getElementsByClassName('cell-your-board')
 opponent_cells = document.getElementsByClassName(`cell-opponent-board`)
 warning_bar = document.getElementById('warning_bar')
-console.log(warning_bar)
+
 
 const row = 15;
 const col = 15;
@@ -29,6 +30,9 @@ function build_board(board_name){
 
       cell.onclick= function(){
         warning_bar.style.display = 'none'
+        if(Array.from(this.classList).includes('clicked_cell')){
+          return
+        }
         var index = this.dataset.index
         var classes = Array.from(this.classList)
         
@@ -77,4 +81,4 @@ socket.on('turn-evaluation', bool => {
 })
 
 
-socket.emit('enter-room',room_id)
+socket.emit('enter-room',[player_name,room_id])

@@ -4,6 +4,14 @@ const row = 15;
 const col = 15;
 
 client_cells = document.getElementsByClassName('cell')
+const join_enter_button = document.getElementById('join_btn')
+const create_enter_button = document.getElementById('create_btn')
+const id_input_box = document.getElementById('room-id')
+const name_input_box = document.getElementById('name_input')
+const message_bar = document.getElementById('message_bar')
+const message_para = document.getElementById('message')
+
+
 
 // adding cells to html and cell logic   
 function build_board(board_name){
@@ -34,66 +42,105 @@ build_board('matchmaking-board')
 console.log(document.getElementById('matchmaking-board'))
 
 
-const join_button = document.getElementById('join-room')
-const create_button = document.getElementById('create-room')
-const input_box = document.getElementById('room-id')
-const warning_bar = document.getElementById('warning_bar')
-
-function join_room(){
-    warning_bar.style.display ='none';
-    const room_id = input_box.value;
-    if(room_id==''){
-        warning_bar.innerText = 'Please Enter Valid ID!'
-        warning_bar.style.display ='block';
-        return
-    }
-    console.log(room_id)
-    input_box.value = '';    
-    
-    //////JOIN ROOM REQUEST////////
-    socketio.emit('join-room-req',room_id)
-    socketio.on('room-doesnt-exist',room_id=>{
-      warning_bar.innerText = 'Room Does Not Exist'
-      warning_bar.style.display = 'block';
-      return
-    })
-    socketio.on('full-room',room_id=>{
-      warning_bar.innerText = 'FULL ROOM, cant join'
-      warning_bar.style.display = 'block';
-    })
-        //confiramtion
-    socketio.on('change-to-game',room_id=>{
-        window.location.href=`index.html?room=${room_id}` //then socket.emit('enter-room') in script.js
-    })
-    
-
-    
-    
+function create_ask_name(){
+  message_para.innerText = ''
+  join_enter_button.style.display = 'none'
+  message_bar.style.background = "rgba(0,0,0,0)"
+  create_enter_button.style.display = 'block'
+  name_input_box.style.display = 'block'
+  message_bar.style.display = 'flex'
+  
 }
 
-function create_room(){
-    warning_bar.style.display ='none';
-    const room_id = input_box.value;
+function join_ask_name(){
+
+  message_para.innerText = ''
+  create_enter_button.style.display= 'none'
+  join_enter_button.style.display = 'block'
+  name_input_box.style.display = 'block'
+  message_bar.style.background = "rgba(0,0,0,0)"
+  message_bar.style.display = 'flex'
+}
+
+
+
+// CREATE Room Button 
+function enter_room_create(){
+    message_bar.style.display ='none';
+    const room_id = id_input_box.value;
     if(room_id==''){
-        warning_bar.innerText = 'Please Enter Valid ID!'
-        warning_bar.style.display ='block';
+        create_enter_button.style.display = 'none'
+        join_enter_button.style.display = 'none'
+        name_input_box.style.display = 'none'
+        message_bar.style.background = "#f44336"
+        message_para.innerText = 'Please Enter Valid ID!'
+        message_bar.style.display ='flex';
         return
     }
     console.log(room_id)
-    input_box.value = '';
+    id_input_box.value = '';
     
     //////ROOM CREATION REQUEST//////
     socketio.emit('create-room-req',room_id)
     socketio.on('room-aldready-exists',room_id=>{
-        warning_bar.innerText = 'Room Aldready Exists'
-        warning_bar.style.display ='block';
-        console.log(`${room_id} was taken`)
-        return
+      create_enter_button.style.display = 'none'
+        join_enter_button.style.display = 'none'
+        name_input_box.style.display = 'none'
+      message_bar.style.background = "#f44336"
+      message_para.innerText = `Room <${room_id}> Aldready Exists`
+      message_bar.style.display ='flex';
+      console.log(`${room_id} was taken`)
+      return
     })
             //Confirmation
     socketio.on('change-to-game',room_id=>{
-        window.location.href=`index.html?room=${room_id}` //then socket.emit('create-room') in script.js
+        window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}` //then socket.emit('create-room') in script.js
     })
+    
+    
+}
+
+// JOIN Room Button
+function enter_room_join(){
+    message_bar.style.display ='none';
+    const room_id = id_input_box.value;
+    if(room_id==''){
+      create_enter_button.style.display = 'none'
+      join_enter_button.style.display = 'none'
+      name_input_box.style.display = 'none'
+      message_bar.style.background = "#f44336"
+      message_para.innerText = 'Please Enter Valid ID!'
+      message_bar.style.display ='flex';
+      return
+    }
+    console.log(room_id)
+    id_input_box.value = '';    
+    
+    //////JOIN ROOM REQUEST////////
+    socketio.emit('join-room-req',room_id)
+    socketio.on('room-doesnt-exist',room_id=>{
+      create_enter_button.style.display = 'none'
+      join_enter_button.style.display = 'none'
+      name_input_box.style.display = 'none'
+      message_bar.style.background = "#f44336"
+     message_para.innerText = `Room <${room_id}> doesnt exist`
+      message_bar.style.display = 'flex';ss
+      return
+    })
+    socketio.on('full-room',room_id=>{
+      create_enter_button.style.display = 'none'
+      join_enter_button.style.display = 'none'
+      name_input_box.style.display = 'none'
+      message_bar.style.background = "#f44336"
+     message_para.innerText = `Room <${room_id}> Full, Cant Join`
+      message_bar.style.display = 'flex';
+    })
+        //confiramtion
+    socketio.on('change-to-game',room_id=>{
+        window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}` //then socket.emit('enter-room') in script.js
+    })
+    
+
     
     
 }
