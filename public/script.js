@@ -4,17 +4,26 @@ socket.emit('confirm','JS says this')
 socket.on('confirm1',data=>{
   console.log(data)
 })
+
 const params = new URLSearchParams(window.location.search);
 const room_id = params.get('room')
 const player_name = params.get('name')
+const opponent_name = params.get('opponentName')
+
 
 client_cells = document.getElementsByClassName('cell-your-board')
 opponent_cells = document.getElementsByClassName(`cell-opponent-board`)
 warning_bar = document.getElementById('warning_bar')
+const player_name_display = document.getElementById('player_name_label')
+const opponent_name_display = document.getElementById('opponent_name_label')
+
+player_name_display.innerText = player_name
+opponent_name_display.innerText = opponent_name
 
 
 const row = 15;
 const col = 15;
+
 
 //adding cells to html and cell logic   
 function build_board(board_name){
@@ -66,6 +75,11 @@ socket.on('player-alone',bool=>{
   
 })
 
+socket.on('oppponent joined',name=>{
+  opponent_name_display.innerText = name
+})
+
+
 socket.on('turn-evaluation', bool => {
   if (!bool) {
     warning_bar.innerText = 'NOT YOUR TURN';
@@ -80,5 +94,6 @@ socket.on('turn-evaluation', bool => {
   }
 })
 
-
+console.log(params)
+console.log(room_id)
 socket.emit('enter-room',[player_name,room_id])

@@ -51,6 +51,15 @@ header h1 {
   flex-direction: column;
   align-items: center;
 }
+.player_name {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #4CAF50;      /* same theme accent */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
 .board h2 {
   margin-bottom: 1rem;

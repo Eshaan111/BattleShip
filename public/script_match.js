@@ -67,7 +67,7 @@ function join_ask_name(){
 // CREATE Room Button 
 function enter_room_create(){
     message_bar.style.display ='none';
-    const room_id = id_input_box.value;
+    var room_id = id_input_box.value;
     if(room_id==''){
         create_enter_button.style.display = 'none'
         join_enter_button.style.display = 'none'
@@ -93,8 +93,10 @@ function enter_room_create(){
       return
     })
             //Confirmation
-    socketio.on('change-to-game',room_id=>{
-        window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}` //then socket.emit('create-room') in script.js
+    socketio.on('change-to-game',data=>{
+      // data = [room_id,opponent_exists,opponent_name]
+      var room_id = data[0]
+      window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}` //then socket.emit('create-room') in script.js
     })
     
     
@@ -103,7 +105,7 @@ function enter_room_create(){
 // JOIN Room Button
 function enter_room_join(){
     message_bar.style.display ='none';
-    const room_id = id_input_box.value;
+    var room_id = id_input_box.value;
     if(room_id==''){
       create_enter_button.style.display = 'none'
       join_enter_button.style.display = 'none'
@@ -117,14 +119,15 @@ function enter_room_join(){
     id_input_box.value = '';    
     
     //////JOIN ROOM REQUEST////////
-    socketio.emit('join-room-req',room_id)
+    console.log('reached here')
+    socketio.emit('join-room-req',[room_id,name_input_box.value])
     socketio.on('room-doesnt-exist',room_id=>{
       create_enter_button.style.display = 'none'
       join_enter_button.style.display = 'none'
       name_input_box.style.display = 'none'
       message_bar.style.background = "#f44336"
      message_para.innerText = `Room <${room_id}> doesnt exist`
-      message_bar.style.display = 'flex';ss
+      message_bar.style.display = 'flex';
       return
     })
     socketio.on('full-room',room_id=>{
@@ -136,8 +139,14 @@ function enter_room_join(){
       message_bar.style.display = 'flex';
     })
         //confiramtion
-    socketio.on('change-to-game',room_id=>{
-        window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}` //then socket.emit('enter-room') in script.js
+    socketio.on('change-to-game',data=>{
+      //data = [room_id,opponent_exists(0/1),opponent_name]
+      room_id = data[0]
+      console.log('reaching')
+      console.log(room_id)
+      console.log(name_input_box.value)
+      console.log(data[2])
+      window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}&opponentName=${data[2]}` //then socket.emit('enter-room') in script.js
     })
     
 

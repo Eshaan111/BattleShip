@@ -30,7 +30,7 @@ io.on('connect',socket=>{
             }
         }
         console.log('changing to game')
-        socket.emit('change-to-game',room_id)
+        socket.emit('change-to-game',[room_id,0,''])
     })
     socket.on('enter-room',data=>{
         //data = [player_name,room_id]
@@ -50,14 +50,35 @@ io.on('connect',socket=>{
     })
 
     ///JOINING ROOM///
-    socket.on('join-room-req',room_id=>{
+    socket.on('join-room-req',data=>{
+        var room_id = data[0]
+        var name = data[1]
         var room_player_count = 0;
         for(id in players){
             if(players[id].room_id == room_id){room_player_count++}
         }
         if(room_player_count == 0 ){socket.emit('room-doesnt-exist',room_id); return}
         if(room_player_count > 1 ){socket.emit('full-room',room_id);return}
-        if(room_player_count == 1 ){socket.emit('change-to-game',room_id)}
+
+        if(room_player_count == 1 ){
+            console.log('YAHA')
+            var opponent_name= ''
+            for(play_id in players){
+                if(players[play_id].room_id == room_id && play_id != socket.id){
+                    var opponent_id = play_id
+                    io.to(play_id).emit('oppponent joined',name)
+                    opponent_name = players[play_id].playerName
+                    console.log('idhar')
+                    var opponent_exists = 1
+                    console.log('reaching')
+                    socket.emit('change-to-game',[room_id,opponent_exists,opponent_name])
+                    return
+            }
+            
+            
+            
+            }
+        }
 
     })
 

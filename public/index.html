@@ -12,20 +12,20 @@
   </header>
 
   <main class="boards">
-    <!-- Your Board -->
-    <section class="board">
-      <h2>Your Board</h2>
-      <div class="grid" id="your-board">
-      </div>
-    </section>
+  <!-- Your Board -->
+  <section class="board">
+    <div class="player_name" id="player_name_label" >YOU</div>
+    <h2>Your Board</h2>
+    <div class="grid" id="your-board"></div>
+  </section>
 
-    <!-- Opponent Board -->
-    <section class="board">
-      <h2>Opponent Board</h2>
-      <div class="grid" id="opponent-board">
-      </div>
-    </section>
-  </main>
+  <!-- Opponent Board -->
+  <section class="board">
+    <div class="player_name" id="opponent_name_label">OPPONENT</div>
+    <h2>Opponent Board</h2>
+    <div class="grid" id="opponent-board"></div>
+  </section>
+</main>
   <div class = 'warning_bar' id="warning_bar"></div>
 
   <script src="/socket.io/socket.io.min.js"></script>
