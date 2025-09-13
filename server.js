@@ -61,16 +61,13 @@ io.on('connect',socket=>{
         if(room_player_count > 1 ){socket.emit('full-room',room_id);return}
 
         if(room_player_count == 1 ){
-            console.log('YAHA')
             var opponent_name= ''
             for(play_id in players){
                 if(players[play_id].room_id == room_id && play_id != socket.id){
                     var opponent_id = play_id
                     io.to(play_id).emit('oppponent joined',name)
                     opponent_name = players[play_id].playerName
-                    console.log('idhar')
                     var opponent_exists = 1
-                    console.log('reaching')
                     socket.emit('change-to-game',[room_id,opponent_exists,opponent_name])
                     return
             }
