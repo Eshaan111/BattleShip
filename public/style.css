@@ -104,6 +104,13 @@ header h1 {
   /* position: fixed; */
 }
 
+.ship-placed-cell {
+  background-color: steelblue;
+  border-radius: 3px;
+  /* position: fixed; */
+}
+
+
 .ship:active {
   cursor: grabbing;
   transform: scale(1.05);
