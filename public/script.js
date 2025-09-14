@@ -78,32 +78,58 @@ build_board('opponent-board')
 //adding ship cells to ship pane 
 let shipMatrix = [
   [1, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
+  [1, 0, 0, 0],
+  [1, 1, 1, 0],
   [0, 0, 0, 0]
 ];
 
 const shipContainer = document.getElementById("ship-1");
+// ships = {
+//      
+//        ship1 : [[1,2],[2,4]] ie indexes of ship cell in matrix
+// 
+// }
 
-for (let r = 0; r < 4; r++) {
-  for (let c = 0; c < 4; c++) {
-    if (shipMatrix[r][c] === 1) {
-      const cell = document.createElement("div");
-      cell.classList.add("ship-cell");
-      shipContainer.appendChild(cell);
-    } else {
-      const empty = document.createElement("div");
-      empty.style.background = "transparent";
-      shipContainer.appendChild(empty);
+ships = {}
+
+function render_ship(container,shipMatrix,class_name){
+  ship_indexes = []
+  var ship_cell_divs = []
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 4; c++) {
+      if (shipMatrix[r][c] === 1) {
+        const cell = document.createElement("div");
+        cell.classList.add(class_name);
+        container.appendChild(cell);
+        ship_cell_divs[ship_cell_divs.length] = cell
+        ship_indexes[ship_indexes.length] = [r,c]
+      } else {
+        const empty = document.createElement("div");
+        empty.style.background = "transparent";
+        container.appendChild(empty);
+      }
     }
   }
+  return [ship_indexes, ship_cell_divs]
+
 }
+
+var render_output = render_ship(shipContainer,shipMatrix,'ship-cell')
+ships[shipContainer] = {shipIndexes : render_output[0], shipCellDivs : render_output[1]}
+console.log(ships)
+
+
+// ship_count = Object.keys(ships).length;
+// ships[`ship-${ship_count}`] = []
+
+
 
 
 let startX = 0; let startY = 0;
 let ghost_cell = null;
 
 
+//make 1 cell draggable
 function makeCellDraggable(cell){
   cell.addEventListener('mousedown', e => {
     e.preventDefault();
@@ -183,10 +209,67 @@ function makeCellDraggable(cell){
     document.addEventListener('mousemove', mouseMove);
     document.addEventListener('mouseup', mouseUp);
   });
-};
+}; 0 
+
+
+
+function makeShipDraggable(ship_container){
+  let ship_cell_arr = ships[ship_container].shipCellDivs
+  let ship_cell_indexes = ships[ship_container].shipIndexes
+
+  
+  ship_cell_arr.forEach(cell=>{
+    
+    cell.addEventListener('mousedown',e=>{
+      let anchor_cell_in_arr
+      e.preventDefault
+      const container_rect = shipContainer.getBoundingClientRect();
+      const cell_rect = cell.getBoundingClientRect()
+      count = 0
+      ship_cell_arr.forEach(cell_div => {
+        if(cell_div == cell){
+          anchor_cell_in_arr = count
+        }else{count++}
+        cell_div.style.display = 'none'
+      });
+      anchor_cell = cell
+      anchor_cell_index = ships[shipContainer].shipIndexes[anchor_cell_in_arr]
+      console.log(anchor_cell_index)
+
+      ghost_container = document.createElement('div')
+      ghost_container.classList.add('ghost_container');
+      ghost_container.style.width = container_rect.width + 'px';
+      ghost_container.style.height = container_rect.height + 'px';
+      render_ship(ghost_container,shipMatrix,'ghost_cell')
+      ghost_container.style.position = 'absolute';
+      ghost_container.style.background = 'transparent';
+      ghost_container.style.left = e.clientX - (cell_rect.width /2) - cell_rect.width*anchor_cell_index[1] + 'px';
+      ghost_container.style.top = e.clientY - cell_rect.height / 2 - cell_rect.height*anchor_cell_index[0] +'px';
+      ghost_container.style.pointerEvents = 'none';
+      
+      document.body.appendChild(ghost_container);
+      
+      
+
+      function mouseMove(e){
+        ghost_container.style.left = e.clientX - cell_rect.width / 2 - cell_rect.width*anchor_cell_index[1] + 'px';
+        ghost_container.style.top = e.clientY - cell_rect.height / 2 - cell_rect.height*anchor_cell_index[0] + 'px';
+      }
+    
+    
+      document.addEventListener('mousemove',mouseMove)
+    })
+
+  })
+  
+    
+
+
+}
 
 const ship_cells = Array.from(document.getElementsByClassName('ship-cell'));
-ship_cells.forEach(cell => makeCellDraggable(cell));
+// ship_cells.forEach(cell => makeCellDraggable(cell));
+makeShipDraggable(shipContainer)
 
 
 

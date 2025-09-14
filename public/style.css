@@ -151,6 +151,23 @@ header h1 {
   -webkit-user-drag: none; /* disable native drag on Safari/Chrome */
 }
 
+.ghost_container {
+  display: grid;
+  grid-template-rows: repeat(4, 20px);
+  grid-template-columns: repeat(4, 20px);
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 5px;
+  border-radius: 6px;
+}
+
+.ghost_cell{
+  /* position: absolute; */
+  background-color: steelblue;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
 
 .cell:hover {
   background: var(--grid-hover);
