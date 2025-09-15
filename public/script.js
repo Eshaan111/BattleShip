@@ -84,6 +84,7 @@ let shipMatrix = [
 ];
 
 const shipContainer = document.getElementById("ship-1");
+console.log(shipContainer)
 // ships = {
 //      
 //        ship1 : [[1,2],[2,4]] ie indexes of ship cell in matrix
@@ -100,6 +101,9 @@ function render_ship(container,shipMatrix,class_name){
       if (shipMatrix[r][c] === 1) {
         const cell = document.createElement("div");
         cell.classList.add(class_name);
+        client_cell_rect = client_cells[0].getBoundingClientRect()
+        cell.style.width = client_cell_rect.width + 'px'
+        cell.style.height = client_cell_rect.height + 'px'
         container.appendChild(cell);
         ship_cell_divs[ship_cell_divs.length] = cell
         ship_indexes[ship_indexes.length] = [r,c]
@@ -221,10 +225,13 @@ function makeShipDraggable(ship_container){
   ship_cell_arr.forEach(cell=>{
     
     cell.addEventListener('mousedown',e=>{
+      
       let anchor_cell_in_arr
       e.preventDefault
       const container_rect = shipContainer.getBoundingClientRect();
       const cell_rect = cell.getBoundingClientRect()
+      shipContainer.style.gridTemplateRows = 'repeat(4,20px)'
+      shipContainer.style.gridTemplateColumns = 'repeat(4,20px)'
       count = 0
       ship_cell_arr.forEach(cell_div => {
         if(cell_div == cell){
@@ -289,7 +296,8 @@ function makeShipDraggable(ship_container){
         //   index = 0
         //   if()
         //   row_difference = row_drop - ()
-        // }  
+        // } 
+        arr_dropped_index = [] 
         ships[shipContainer].shipIndexes.forEach(index_arr => {
 
           anchor_shipgrid_row = anchor_cell_index[0]
@@ -299,11 +307,33 @@ function makeShipDraggable(ship_container){
           let new_index = 0
           var col_diff = curr_cell_col - anchor_shipgrid_col
           var row_diff = curr_cell_row - anchor_shipgrid_row
-          console.log(`Anchor row,col = [${anchor_shipgrid_row},${anchor_shipgrid_col}] cell row-col = [${curr_cell_row},${curr_cell_col}], col_diff = [${row_diff},${col_diff}]`)
+          // console.log(`Anchor row,col = [${anchor_shipgrid_row},${anchor_shipgrid_col}] cell row-col = [${curr_cell_row},${curr_cell_col}], col_diff = [${row_diff},${col_diff}]`)
           new_index += 15*(row_drop + row_diff)
           new_index += col_drop + col_diff
-          console.log(`row = ${row_drop + row_diff} col ${col_drop + col_diff}`)
+          arr_dropped_index[arr_dropped_index.length] = new_index
+          cell_row_drop = row_drop + row_diff
+          cell_col_drop = col_drop + col_diff
+
+          console.log(`row = ${cell_row_drop} col ${cell_col_drop}`)
+          if(new_index>= 0 && new_index<225 ){
+            cell_grid[cell_row_drop][cell_col_drop] = {occupied : true, shidId : shipContainer}
+            cell_placed = Array.from(client_cells)[new_index]
+            cell_placed.classList.remove('cell')
+            cell_placed.classList.add('ship-placed-cell')
+          }
+          else{
+            shipContainer.style.gridTemplateColumns = 'repeat(4,auto)'
+            shipContainer.style.gridTemplateRows = 'repeat(4,auto)'
+            ship_cell_arr.forEach(cell_div => {
+              cell_div.style.display = 'block'
+              });
+            // ghost_container.remove()
+            // ghost_container = null
+          }
         });
+        ghost_container.remove()
+        ghost_container = null
+
 
       }
     
