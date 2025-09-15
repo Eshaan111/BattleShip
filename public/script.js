@@ -68,11 +68,6 @@ function build_board(board_name){
 
 build_board('your-board')
 build_board('opponent-board')
-// document.querySelectorAll('.cell').forEach(cell => {
-//   cell.addEventListener('mouseenter', () => {
-//     console.log("Hovered cell:", cell.dataset.index);
-//   });
-// });
  console.log(client_cells)
 
 //adding ship cells to ship pane 
@@ -92,6 +87,8 @@ console.log(shipContainer)
 // }
 
 ships = {}
+dropped_ships = {}
+//dropped_ships = {ship_id: 1, dropp_cell_index = [233,222,123....]]
 
 function render_ship(container,shipMatrix,class_name){
   ship_indexes = []
@@ -114,6 +111,7 @@ function render_ship(container,shipMatrix,class_name){
       }
     }
   }
+  //ship_indexes = index of ship in a 4x4 ship-grid-matrix
   return [ship_indexes, ship_cell_divs]
 
 }
@@ -123,104 +121,20 @@ ships[shipContainer] = {shipIndexes : render_output[0], shipCellDivs : render_ou
 console.log(ships)
 
 
-// ship_count = Object.keys(ships).length;
-// ships[`ship-${ship_count}`] = []
-
-
-
-
 let startX = 0; let startY = 0;
 let ghost_cell = null;
 
-
-//make 1 cell draggable
-function makeCellDraggable(cell){
-  cell.addEventListener('mousedown', e => {
-    e.preventDefault();
-
-    const rect = cell.getBoundingClientRect();
-    if(Array.from(cell.classList).includes('ship-placed-cell')){
-      cell.classList.remove('ship-placed-cell')
-      cell.classList.add('cell')
-      cell.classList.add('moved-from-board')
-    }
-    else{cell.style.display = 'none';}
-    
-
-    ghost_cell = document.createElement('div');
-    ghost_cell.classList.add('ghost-cell');
-    ghost_cell.style.width = rect.width + 'px';
-    ghost_cell.style.height = rect.height + 'px';
-    ghost_cell.style.position = 'absolute';
-    ghost_cell.style.background = 'white';
-    ghost_cell.style.left = e.clientX - rect.width / 2 + 'px';
-    ghost_cell.style.top = e.clientY - rect.height / 2 + 'px';
-    ghost_cell.style.pointerEvents = 'none';
-    document.body.appendChild(ghost_cell);
-
-    const client_board = document.getElementById('your-board'); // your board
-
-    function mouseMove(e) {
-      ghost_cell.style.left = e.clientX - rect.width / 2 + 'px';
-      ghost_cell.style.top = e.clientY - rect.height / 2 + 'px';
-    }
-
-    function mouseUp(e) {
-      document.removeEventListener('mousemove', mouseMove);
-      document.removeEventListener('mouseup', mouseUp);
-
-      // Compute dropped cell
-      const boardRect = client_board.getBoundingClientRect();
-      const cellSize = boardRect.width / 15; // assuming 15x15 grid
-      const col = Math.floor((e.clientX - boardRect.left) / cellSize);
-      const row = Math.floor((e.clientY - boardRect.top) / cellSize);
-
-      console.log(`Dropped on row ${row}, col ${col}`);
-      
-      index = 15*row + col
-
-      // if dropped on board 
-      if(row>=0 && col>=0 && row<15 && col<15){
-        cell_grid[row][col] = {occupied: true, shidId : 1}
-        cell_palced = Array.from(client_cells)[index] 
-        cell_palced.classList.remove('cell')
-        cell_palced.classList.add('ship-placed-cell')
-        console.log(cell_grid)
-        console.log(Array.from(client_cells)[index])
-        // Clean up
-        ghost_cell.remove();
-        ghost_cell = null;
-        makeCellDraggable(cell_palced)
-
-      }else{
-        
-        if(Array.from(cell.classList).includes('moved-from-board')){
-          console.log('aither')
-          cell.classList.remove('cell')
-          cell.classList.add('ship-placed-cell')
-          ghost_cell.remove();
-
-        }else{
-          cell.style.display = 'block';
-          ghost_cell.remove();
-        }
-      }
-      
-
-      
-    }
-
-    document.addEventListener('mousemove', mouseMove);
-    document.addEventListener('mouseup', mouseUp);
-  });
-}; 0 
-
-
-
-function makeShipDraggable(ship_container){
-  let ship_cell_arr = ships[ship_container].shipCellDivs
-  let ship_cell_indexes = ships[ship_container].shipIndexes
-
+function makeShipDraggable(type_of_cell,ship_container=null,place_index_arr = null){
+  let ship_cell_arr
+  let ship_cell_indexes
+  if(type_of_cell=='unplaced'){
+    ship_cell_arr = ships[ship_container].shipCellDivs
+    ship_cell_indexes = ships[ship_container].shipIndexes
+  }
+  else{
+  
+  }
+  
   
   ship_cell_arr.forEach(cell=>{
     
@@ -239,6 +153,7 @@ function makeShipDraggable(ship_container){
         }else{count++}
         cell_div.style.display = 'none'
       });
+
       anchor_cell = cell
       anchor_cell_index = ships[shipContainer].shipIndexes[anchor_cell_in_arr]
       console.log(anchor_cell_index)
@@ -310,15 +225,21 @@ function makeShipDraggable(ship_container){
         count = 0
         to_place = true
         //checking placement 
+        console.log(arr_dropped_index)
         arr_dropped_index.forEach(arr => {
           new_index = arr[0]
-          if(new_index>= 0 && new_index<225){to_place = true}
-          else{to_place = false;return} 
+          new_row = arr[1]
+          new_col = arr[2]
+          if(new_row< 0 || new_row>14 ||new_col<0 || new_col>14 || new_index<0 || new_index > 255){
+            to_place = false;
+            return
+          }
         });
         console.log(to_place)
 
         if(to_place){
           ships[shipContainer].shipIndexes.forEach(index_arr => {
+
             new_index = arr_dropped_index[count][0]
             cell_row_drop = arr_dropped_index[count][1]
             cell_col_drop = arr_dropped_index[count][2]
@@ -330,8 +251,8 @@ function makeShipDraggable(ship_container){
           })
         }
         else{
-          console.log(reaching)
-          
+          restoreOriginal()
+          return
         }
         ghost_container.remove()
         ghost_container = null
@@ -346,26 +267,15 @@ function makeShipDraggable(ship_container){
           ghost_container = null
         }
       }
-      
-    
-    
       document.addEventListener('mousemove',mouseMove)
       document.addEventListener('mouseup',mouseUp)
     })
-
-    
-
-
   })
-  
-    
-
-
 }
 
 const ship_cells = Array.from(document.getElementsByClassName('ship-cell'));
 // ship_cells.forEach(cell => makeCellDraggable(cell));
-makeShipDraggable(shipContainer)
+makeShipDraggable('unplaced',ship_container = shipContainer)
 
 
 
