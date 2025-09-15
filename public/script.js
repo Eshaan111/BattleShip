@@ -273,31 +273,22 @@ function makeShipDraggable(ship_container){
 
         const cell = el.closest('.cell, .ship-cell');     // adapt to your classes
         if (!cell || !client_board.contains(cell)) {
-        // dropped outside board
-        restoreOriginal();
-        return;
-       }
+          // dropped outside board
+          restoreOriginal();
+          return;
+        }
 
-    // read index (you already set data-index = r*COLS + c)
-    const index = parseInt(cell.dataset.index, 10);
-    if (Number.isNaN(index)) { restoreOriginal(); return; }
+        // read index (you already set data-index = r*COLS + c)
+        const index = parseInt(cell.dataset.index, 10);
+        if (Number.isNaN(index)) { restoreOriginal(); return; }
 
-    const COLS = 15;
-    const row_drop = Math.floor(index / COLS);
-    const col_drop = index % COLS;
+        const COLS = 15;
+        const row_drop = Math.floor(index / COLS);
+        const col_drop = index % COLS;
 
-    console.log('Dropped on row', row_drop, 'col', col_drop);
-
-        //calculating cells on your-board-grid
-        // for(i=0;i<ships[shipContainer].shipIndexes.length;i++){
-
-        //   anchor_shipgrid_row = anchor_cell_index[0]
-        //   anchor_shipgrid_col = anchor_cell_index[0]
-        //   index = 0
-        //   if()
-        //   row_difference = row_drop - ()
-        // } 
-        arr_dropped_index = [] 
+        console.log('Dropped on row', row_drop, 'col', col_drop);
+        arr_dropped_index = []
+        //arr dropped index = [[index,row,col],[index,row,col],[index,row,col]] 
         ships[shipContainer].shipIndexes.forEach(index_arr => {
 
           anchor_shipgrid_row = anchor_cell_index[0]
@@ -310,37 +301,60 @@ function makeShipDraggable(ship_container){
           // console.log(`Anchor row,col = [${anchor_shipgrid_row},${anchor_shipgrid_col}] cell row-col = [${curr_cell_row},${curr_cell_col}], col_diff = [${row_diff},${col_diff}]`)
           new_index += 15*(row_drop + row_diff)
           new_index += col_drop + col_diff
-          arr_dropped_index[arr_dropped_index.length] = new_index
           cell_row_drop = row_drop + row_diff
           cell_col_drop = col_drop + col_diff
-
+          arr_dropped_index[arr_dropped_index.length] = [new_index,cell_row_drop,cell_col_drop]
           console.log(`row = ${cell_row_drop} col ${cell_col_drop}`)
-          if(new_index>= 0 && new_index<225 ){
+            
+        });
+        count = 0
+        to_place = true
+        //checking placement 
+        arr_dropped_index.forEach(arr => {
+          new_index = arr[0]
+          if(new_index>= 0 && new_index<225){to_place = true}
+          else{to_place = false;return} 
+        });
+        console.log(to_place)
+
+        if(to_place){
+          ships[shipContainer].shipIndexes.forEach(index_arr => {
+            new_index = arr_dropped_index[count][0]
+            cell_row_drop = arr_dropped_index[count][1]
+            cell_col_drop = arr_dropped_index[count][2]
             cell_grid[cell_row_drop][cell_col_drop] = {occupied : true, shidId : shipContainer}
             cell_placed = Array.from(client_cells)[new_index]
             cell_placed.classList.remove('cell')
             cell_placed.classList.add('ship-placed-cell')
-          }
-          else{
-            shipContainer.style.gridTemplateColumns = 'repeat(4,auto)'
-            shipContainer.style.gridTemplateRows = 'repeat(4,auto)'
-            ship_cell_arr.forEach(cell_div => {
-              cell_div.style.display = 'block'
-              });
-            // ghost_container.remove()
-            // ghost_container = null
-          }
-        });
+            count++
+          })
+        }
+        else{
+          console.log(reaching)
+          
+        }
         ghost_container.remove()
         ghost_container = null
-
-
+        
+        function restoreOriginal(){
+          shipContainer.style.gridTemplateColumns = 'repeat(4,auto)'
+          shipContainer.style.gridTemplateRows = 'repeat(4,auto)'
+          ship_cell_arr.forEach(cell_div => {
+            cell_div.style.display = 'block'
+          });
+          ghost_container.remove()
+          ghost_container = null
+        }
       }
+      
     
     
       document.addEventListener('mousemove',mouseMove)
       document.addEventListener('mouseup',mouseUp)
     })
+
+    
+
 
   })
   
