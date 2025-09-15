@@ -255,9 +255,61 @@ function makeShipDraggable(ship_container){
         ghost_container.style.left = e.clientX - cell_rect.width / 2 - cell_rect.width*anchor_cell_index[1] + 'px';
         ghost_container.style.top = e.clientY - cell_rect.height / 2 - cell_rect.height*anchor_cell_index[0] + 'px';
       }
+
+      function mouseUp(e){
+        document.removeEventListener('mousemove', mouseMove);
+        document.removeEventListener('mouseup', mouseUp);
+
+        // element directly under pointer
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        if (!el) { restoreOriginal(); return; }
+
+        const cell = el.closest('.cell, .ship-cell');     // adapt to your classes
+        if (!cell || !client_board.contains(cell)) {
+        // dropped outside board
+        restoreOriginal();
+        return;
+       }
+
+    // read index (you already set data-index = r*COLS + c)
+    const index = parseInt(cell.dataset.index, 10);
+    if (Number.isNaN(index)) { restoreOriginal(); return; }
+
+    const COLS = 15;
+    const row_drop = Math.floor(index / COLS);
+    const col_drop = index % COLS;
+
+    console.log('Dropped on row', row_drop, 'col', col_drop);
+
+        //calculating cells on your-board-grid
+        // for(i=0;i<ships[shipContainer].shipIndexes.length;i++){
+
+        //   anchor_shipgrid_row = anchor_cell_index[0]
+        //   anchor_shipgrid_col = anchor_cell_index[0]
+        //   index = 0
+        //   if()
+        //   row_difference = row_drop - ()
+        // }  
+        ships[shipContainer].shipIndexes.forEach(index_arr => {
+
+          anchor_shipgrid_row = anchor_cell_index[0]
+          anchor_shipgrid_col = anchor_cell_index[1]
+          curr_cell_row = index_arr[0]
+          curr_cell_col = index_arr[1]
+          let new_index = 0
+          var col_diff = curr_cell_col - anchor_shipgrid_col
+          var row_diff = curr_cell_row - anchor_shipgrid_row
+          console.log(`Anchor row,col = [${anchor_shipgrid_row},${anchor_shipgrid_col}] cell row-col = [${curr_cell_row},${curr_cell_col}], col_diff = [${row_diff},${col_diff}]`)
+          new_index += 15*(row_drop + row_diff)
+          new_index += col_drop + col_diff
+          console.log(`row = ${row_drop + row_diff} col ${col_drop + col_diff}`)
+        });
+
+      }
     
     
       document.addEventListener('mousemove',mouseMove)
+      document.addEventListener('mouseup',mouseUp)
     })
 
   })
