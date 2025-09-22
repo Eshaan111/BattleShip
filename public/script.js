@@ -308,7 +308,9 @@ function makeShipDraggable(type_of_cell,ship_id, ship_container = null, shipMatr
       function restoreOriginal() {
         if (type_of_cell === "unplaced") {
           ship_container.innerHTML = ''
-          render_ship(ship_container,shipMatrix,'ship-cell')
+          var restore_output = render_ship(ship_container, shipMatrix, 'ship-cell')
+          ships[ship_id] = {shipIndexes: restore_output[0], shipCellDivs: restore_output[1]}
+          makeShipDraggable('unplaced',ship_id,ship_container,shipMatrix,dropped_ship_object)
         } else {
           // Properly restore placed ships
           ship_cell_arr.forEach((cell_div) => {
@@ -400,16 +402,24 @@ function makeShipDraggable(type_of_cell,ship_id, ship_container = null, shipMatr
         dropped_ship_object[ship_id].drop_cell_divs = [];
 
         // Place ship on new coordinates
+        valid_place = true;
         arr_dropped_index.forEach(([new_index, r, c]) => {
-          cell_grid[r][c] = { occupied: true, shipId: ship_container };
-          let cell_placed = Array.from(client_cells)[new_index];
-          cell_placed.classList.remove("cell");
-          cell_placed.classList.add("ship-placed-cell");
-
-          dropped_ship_object[ship_id].drop_cell_index.push([new_index, r, c]);
-          dropped_ship_object[ship_id].drop_cell_divs.push(cell_placed);
+          if(cell_grid[r][c].occupied){valid_place = false;return}
         });
+        if(valid_place){
+          arr_dropped_index.forEach(([new_index, r, c]) => {
+            cell_grid[r][c] = { occupied: true, shipId: ship_container };
+            let cell_placed = Array.from(client_cells)[new_index];
+            cell_placed.classList.remove("cell");
+            cell_placed.classList.add("ship-placed-cell");
 
+            dropped_ship_object[ship_id].drop_cell_index.push([new_index, r, c]);
+            dropped_ship_object[ship_id].drop_cell_divs.push(cell_placed);
+          });
+        }
+        else{
+          return restoreOriginal()
+        }
         // Re-enable dragging for newly placed ship
         makeShipDraggable("placed", ship_id, ship_container, shipMatrix, dropped_ship_object);
         ghost_container.remove();
