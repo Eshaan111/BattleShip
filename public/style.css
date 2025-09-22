@@ -72,11 +72,16 @@ header h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 15px;
-  background: var(--grid-bg, #1a1a1a);
+  gap: 20px;
+  padding: 30px 40px;     /* CHANGED: Increased horizontal padding from 20px to 40px */
+  background: var(--grid-bg, #2a3140);
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
   margin-right: 20px;
+  min-width: 150px;       /* CHANGED: Increased from 140px to 180px */
+  width: fit-content;     /* ADDED: Allow natural width expansion */
+  height: 100%;
+  align-self: stretch;
 }
 
 .ship-pane h3 {
@@ -198,4 +203,62 @@ header h1 {
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Ready button styling */
+.ready-btn {
+    margin-top: 15px;
+    padding: 12px 24px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+}
+
+.ready-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+}
+
+.ready-btn:active {
+    transform: translateY(0);
+}
+
+.ready-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ready-btn.ready {
+    background: #2196F3;
+}
+
+.ready-btn.ready:hover {
+    background: #1976D2;
+}
+
+/* Ready status label styling */
+.ready-status {
+    margin-top: 15px;
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    background: #ff4d4d;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background 0.3s;
+}
+
+.ready-status.opponent-ready {
+    background: #4CAF50;
 }

@@ -1,44 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BATTLESHIP</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battleship Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>BATTLESHIP</h1>
-  </header>
-  <div class="game-container">
-    <!-- Ship selection -->
-  <aside class="ship-pane">
-    <h3>Ships</h3>
-    <div class="ship" id="ship-1">
-      <!-- cells will be inserted by JS -->
+    <header>
+        <h1>BATTLESHIP</h1>
+    </header>
+
+    <div class="game-container">
+        <!-- Ship placement pane -->
+        <div class="ship-pane" id="ship-pane">
+            <h3>Ships</h3>
+            <div class="ship" id="ship-1"></div>
+            <div class="ship" id="ship-2"></div>
+        </div>
+
+        <!-- Game boards -->
+        <div class="boards">
+            <div class="board">
+                <div class="player_name" id="player_name_label">Player 1</div>
+                <h2>Your Board</h2>
+                <div class="grid" id="your-board"></div>
+                <!-- Ready button under player's board -->
+                <button id="ready_button" class="ready-btn" onclick= 'playerReadyUp()' >READY UP</button>
+            </div>
+
+            <div class="board">
+                <div class="player_name" id="opponent_name_label">Player 2</div>
+                <h2>Opponent's Board</h2>
+                <div class="grid" id="opponent-board"></div>
+                <!-- Opponent ready status label -->
+                <div id="opponent_ready_status" class="ready-status">Opponent: Not Ready</div>
+            </div>
+        </div>
     </div>
-  </aside>
 
-    <main class="boards">
-    <!-- Your Board -->
-    <section class="board" id = 'client_board'>
-      <div class="player_name" id="player_name_label" >YOU</div>
-      <h2>Your Board</h2>
-      <div class="grid" id="your-board"></div>
-    </section>
+    <div class="warning_bar" id="warning_bar">Warning messages appear here</div>
 
-    <!-- Opponent Board -->
-    <section class="board">
-      <div class="player_name" id="opponent_name_label">OPPONENT</div>
-      <h2>Opponent Board</h2>
-      <div class="grid" id="opponent-board"></div>
-    </section>
-  </main>
-  </div>
-
-  <div class = 'warning_bar' id="warning_bar"></div>
-
-  <script src="/socket.io/socket.io.min.js"></script>
-  <script src = 'script.js'></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
