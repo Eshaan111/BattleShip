@@ -19,7 +19,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  /* padding: 5px; */
   min-height: 100vh;
 }
 
@@ -47,7 +47,7 @@ header h1 {
 
 .board {
   background: var(--panel);
-  padding: 1rem;
+  padding: 5px;
   border-radius: 12px;
   text-align: center;
   display: flex;
@@ -68,20 +68,27 @@ header h1 {
   margin-right: auto;
 }
 
+/* Make the ship pane scrollable with fixed height */
 .ship-pane {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 30px 40px;     /* CHANGED: Increased horizontal padding from 20px to 40px */
-  background: var(--grid-bg, #2a3140);
+  gap: 1.5rem;
+  padding: 1.5rem;  
+  background: var(--grid-bg);
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-  margin-right: 20px;
-  min-width: 150px;       /* CHANGED: Increased from 140px to 180px */
-  width: fit-content;     /* ADDED: Allow natural width expansion */
-  height: 100%;
-  align-self: stretch;
+  width: clamp(140px, 15vw, 200px);
+  
+  /* SCROLLABLE PROPERTIES */
+  max-height: 80vh;           /* Limit height to 80% of viewport */
+  overflow-y: auto;           /* Enable vertical scrolling */
+  overflow-x: hidden;         /* Hide horizontal scrollbar */
+  flex-shrink: 0;            /* Prevent shrinking */
+  
+  /* CUSTOM SCROLLBAR STYLING */
+  scrollbar-width: thin;      /* Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Firefox */
 }
 
 .ship-pane h3 {
@@ -207,7 +214,7 @@ header h1 {
 
 /* Ready button styling */
 .ready-btn {
-    margin-top: 15px;
+    margin-top: 5px;
     padding: 12px 24px;
     background: #4CAF50;
     color: white;

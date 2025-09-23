@@ -131,14 +131,38 @@ let shipMatrix2 = [
   [0, 1, 0, 0]
 ];
 
+let shipMatrix3 = [
+  [1, 1, 1, 0],
+  [0, 1, 0, 0],
+  [0, 1, 1, 1], 
+  [0, 1, 0, 0]
+];
+let shipMatrix4 = [
+  [1, 1, 1, 1],
+  [0, 1, 0, 0],
+  [0, 1, 1, 1], 
+  [0, 1, 0, 0]
+];
+let shipMatrix5 = [
+  [0, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 1, 1, 1], 
+  [1, 1, 1, 1]
+];
 const shipContainer1 = document.getElementById("ship-1");
 const shipContainer2 = document.getElementById("ship-2");
+const shipContainer3 = document.getElementById("ship-3");
+const shipContainer4 = document.getElementById("ship-4");
+const shipContainer5 = document.getElementById("ship-5");
 ships = {}
 // Structure: ships = { shipContainer : {shipIndexes : [[a,b],[c,d]], shipCellDivs : [div1,div2,div3] } }
 
 dropped_ships = {
   'ship1': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix1},
-  'ship2': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix2}, 
+  'ship2': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix2},
+  'ship3': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix2},
+  'ship4': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix2},
+  'ship5': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix2}, 
 }
 // Structure: dropped_ships = {ship_id: { drop_cell_index = [233,222,123....], drop_cell_divs = [div1,div2,div3] }
 
@@ -204,6 +228,16 @@ ships['ship1'] = {shipIndexes : render_output1[0], shipCellDivs : render_output1
 
 var render_output2 = render_ship(shipContainer2, shipMatrix2, 'ship-cell')
 ships['ship2'] = {shipIndexes : render_output2[0], shipCellDivs : render_output2[1]}
+
+var render_output3 = render_ship(shipContainer3, shipMatrix3, 'ship-cell')
+ships['ship3'] = {shipIndexes : render_output3[0], shipCellDivs : render_output3[1]}
+
+var render_output4 = render_ship(shipContainer4, shipMatrix4, 'ship-cell')
+ships['ship4'] = {shipIndexes : render_output4[0], shipCellDivs : render_output4[1]}
+
+var render_output5 = render_ship(shipContainer5, shipMatrix5, 'ship-cell')
+ships['ship5'] = {shipIndexes : render_output5[0], shipCellDivs : render_output5[1]}
+
 
 console.log(ships)
 
@@ -316,6 +350,7 @@ function makeShipDraggable(type_of_cell,ship_id, ship_container = null, shipMatr
           ship_cell_arr.forEach((cell_div) => {
             cell_div.classList.add("ship-placed-cell");
             cell_div.classList.remove("cell");
+
           });
         }
         ghost_container.remove();
@@ -442,7 +477,9 @@ const ship_cells = Array.from(document.getElementsByClassName('ship-cell'));
 
 makeShipDraggable('unplaced', 'ship1', shipContainer1, shipMatrix1, dropped_ships)
 makeShipDraggable('unplaced', 'ship2', shipContainer2, shipMatrix2, dropped_ships)
-
+makeShipDraggable('unplaced', 'ship3', shipContainer3, shipMatrix3, dropped_ships)
+makeShipDraggable('unplaced', 'ship4', shipContainer4, shipMatrix4, dropped_ships)
+makeShipDraggable('unplaced', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
 
 
 
