@@ -25,7 +25,7 @@ body {
 
 header h1 {
   font-size: 2.5rem;
-  margin: 1rem 0;
+  margin: 0 0;
   letter-spacing: 0.1em;
 }
 
@@ -46,14 +46,17 @@ header h1 {
 }
 
 .board {
-  background: var(--panel);
-  padding: 5px;
-  border-radius: 12px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;               /* split space equally between two boards */
+    background: var(--panel);
+    padding: 5px;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    /* overflow: hidden; ADD THIS */
+    overflow: visible;
+    min-height: 0; /* IMPORTANT for flexbox */
 }
 
 .game-container {
@@ -139,28 +142,29 @@ header h1 {
 }
 
 .board h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 5px;
   font-size: 1.2rem;
 }
 
 /* Grid: 15x15 */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(15, 1fr);
-  gap: 2px;
-  width: 95%;          /* scale relative to parent */
-  aspect-ratio: 1 / 1; /* keep square */
-  max-width: 550px;    /* prevents cells from being too small */
-  margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    gap: 2px;
+    width: min(95%, 500px); /* Cap maximum width */
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    box-sizing: border-box; /* Include padding/borders in size */
 }
-
 .cell {
-  background: var(--grid-bg);
-  border-radius: 2px;
-  aspect-ratio: 1/1;
-  transition: background 0.2s;
-  user-select: none;      /* text not selectable */
-  -webkit-user-drag: none; /* disable native drag on Safari/Chrome */
+    background: var(--grid-bg);
+    border-radius: 2px;
+    aspect-ratio: 1/1;
+    transition: background 0.2s;
+    user-select: none;
+    -webkit-user-drag: none;
+    min-width: 0; /* Prevent flex growth */
+    min-height: 0; /* Prevent flex growth */
 }
 
 .ghost_container {
