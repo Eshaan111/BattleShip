@@ -134,10 +134,10 @@ let shipMatrix2 = [
 ];
 
 let shipMatrix3 = [
-  [1, 1, 1, 0],
+  [0, 1, 1, 0],
   [0, 1, 0, 0],
-  [0, 1, 1, 1], 
-  [0, 1, 0, 0]
+  [0, 1, 0, 0], 
+  [0, 1, 1, 0]
 ];
 let shipMatrix4 = [
   [1, 1, 1, 1],
@@ -479,15 +479,22 @@ function lock_board(){
     });
 }
 
-function unlock_board(){
-    makeShipDraggable('unplaced', 'ship1', shipContainer1, shipMatrix1, dropped_ships)
-    makeShipDraggable('unplaced', 'ship2', shipContainer2, shipMatrix2, dropped_ships)
-    makeShipDraggable('unplaced', 'ship3', shipContainer3, shipMatrix3, dropped_ships)
-    makeShipDraggable('unplaced', 'ship4', shipContainer4, shipMatrix4, dropped_ships)
-    makeShipDraggable('unplaced', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
+makeShipDraggable('unplaced', 'ship1', shipContainer1, shipMatrix1, dropped_ships)
+makeShipDraggable('unplaced', 'ship2', shipContainer2, shipMatrix2, dropped_ships)
+makeShipDraggable('unplaced', 'ship3', shipContainer3, shipMatrix3, dropped_ships)
+makeShipDraggable('unplaced', 'ship4', shipContainer4, shipMatrix4, dropped_ships)
+makeShipDraggable('unplaced', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
 
+
+function unlock_board(){
+
+    makeShipDraggable('placed', 'ship1', shipContainer1, shipMatrix1, dropped_ships)
+    makeShipDraggable('placed', 'ship2', shipContainer2, shipMatrix2, dropped_ships)
+    makeShipDraggable('placed', 'ship3', shipContainer3, shipMatrix3, dropped_ships)
+    makeShipDraggable('placed', 'ship4', shipContainer4, shipMatrix4, dropped_ships)
+    makeShipDraggable('placed', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
 }
-unlock_board()
+
 
 // Initialize dragging for unplaced ships4
 const ship_cells = Array.from(document.getElementsByClassName('ship-cell'));
