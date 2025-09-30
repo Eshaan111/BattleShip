@@ -32,6 +32,7 @@ io.on('connect',socket=>{
         console.log('changing to game')
         socket.emit('change-to-game',[room_id,0,''])
     })
+    
     socket.on('enter-room',data=>{
         //data = [player_name,room_id]
         const room_id = data[1]
@@ -78,7 +79,6 @@ io.on('connect',socket=>{
         }
 
     })
-
 
     socket.on('cell_clicked',index=>{
 
@@ -128,6 +128,20 @@ io.on('connect',socket=>{
         
         
     
+    })
+    
+    socket.on('ready-up',room_id=>{
+        let oppponenet_id;
+        Array.from(Object.keys(players)).forEach(curr_socket_id => {
+            iter_room_id = players[curr_socket_id].room_id
+            if (iter_room_id == room_id && curr_socket_id!=socket.id) {
+                opponent_id = curr_socket_id
+                return
+            }
+        });
+        io.to(opponent_id).emit('opponent-ready',room_id)
+        console.log(`emitting ready-up to ${opponent_id}`)
+
     })
 
     socket.on('print-players',room_id=>{

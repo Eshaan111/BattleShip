@@ -34,13 +34,14 @@ client_cells = document.getElementsByClassName('cell-your-board')           // Y
 opponent_cells = document.getElementsByClassName(`cell-opponent-board`)     // Enemy's grid to attack
 warning_bar = document.getElementById('warning_bar')                        // Status messages
 const player_ready_label = document.getElementById('player-ready-status')
+const opponent_ready_label = document.getElementById('opponent-ready-status')
 const player_name_display = document.getElementById('player_name_label')
 const opponent_name_display = document.getElementById('opponent_name_label')
 const shipPane = document.getElementById("ship-pane");                      // Ship placement area
 
 // Initialize player name displays
 player_name_display.innerText = player_name;
-(opponent_name=='invalid')?opponent_name_display.innerText = opponent_name : opponent_name_display.innerText = '<Opponent-Not-Joined>'
+(opponent_name=='invalid')?opponent_name_display.innerText =  '<Opponent-Not-Joined>' : opponent_name_display.innerText = opponent_name
 
 //----------------------------------------------------------------------------
 // GAME BOARD CONFIGURATION
@@ -497,12 +498,14 @@ function playerReadyUp(){
     if (con_ready) {
         player_ready_label.innerText = 'Ready'
         player_ready_label.style.color = '#45a049'
+        socket.emit('ready-up',room_id)
     }else{
         warning_bar.innerText = 'Ships-remaining'
         warning_bar.style.display = 'block'
     }
 
-} 
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -528,6 +531,10 @@ socket.on('oppponent joined', name => {
   opponent_name_display.innerText = name
 })
 
+socket.on('opponent-ready',room_id=>{
+    opponent_ready_label.innerText = 'Ready'
+    opponent_ready_label.style.color = '#45a049'
+})
 // Turn validation and attack processing
 socket.on('turn-evaluation', bool => {
   if (!bool) {
