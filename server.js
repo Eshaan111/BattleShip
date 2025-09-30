@@ -131,7 +131,7 @@ io.on('connect',socket=>{
     })
     
     socket.on('ready-up',room_id=>{
-        let oppponenet_id;
+        let opponent_id;
         Array.from(Object.keys(players)).forEach(curr_socket_id => {
             iter_room_id = players[curr_socket_id].room_id
             if (iter_room_id == room_id && curr_socket_id!=socket.id) {
@@ -142,6 +142,10 @@ io.on('connect',socket=>{
         io.to(opponent_id).emit('opponent-ready',room_id)
         console.log(`emitting ready-up to ${opponent_id}`)
 
+    })
+
+    socket.on('both-player-ready',([room_id,dropped_ships])=>{
+        
     })
 
     socket.on('print-players',room_id=>{

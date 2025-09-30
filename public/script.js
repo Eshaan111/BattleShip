@@ -473,39 +473,64 @@ function makeShipDraggable(type_of_cell,ship_id, ship_container = null, shipMatr
   });
 }
 
+function lock_board(){
+    Array.from(client_cells).forEach(cell => {
+      cell.removeEventListener("mousedown", cell._dragHandler);
+    });
+}
+
+function unlock_board(){
+    makeShipDraggable('unplaced', 'ship1', shipContainer1, shipMatrix1, dropped_ships)
+    makeShipDraggable('unplaced', 'ship2', shipContainer2, shipMatrix2, dropped_ships)
+    makeShipDraggable('unplaced', 'ship3', shipContainer3, shipMatrix3, dropped_ships)
+    makeShipDraggable('unplaced', 'ship4', shipContainer4, shipMatrix4, dropped_ships)
+    makeShipDraggable('unplaced', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
+
+}
+unlock_board()
+
 // Initialize dragging for unplaced ships4
 const ship_cells = Array.from(document.getElementsByClassName('ship-cell'));
 
 
-makeShipDraggable('unplaced', 'ship1', shipContainer1, shipMatrix1, dropped_ships)
-makeShipDraggable('unplaced', 'ship2', shipContainer2, shipMatrix2, dropped_ships)
-makeShipDraggable('unplaced', 'ship3', shipContainer3, shipMatrix3, dropped_ships)
-makeShipDraggable('unplaced', 'ship4', shipContainer4, shipMatrix4, dropped_ships)
-makeShipDraggable('unplaced', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
-
-
+let player_ready = false;
 function playerReadyUp(){
-    warning_bar.style.display = 'none'
-    let con_ready = true;
-    Array.from(Object.keys(dropped_ships)).forEach(ship_id=>{
-        cell_index_arr = dropped_ships[ship_id].drop_cell_index     
-        console.log(cell_index_arr)
-        if (cell_index_arr.length ==0) {
-            con_ready = false
-            return
+    if(player_ready == false){
+
+        warning_bar.style.display = 'none'
+        let con_ready = true;
+        Array.from(Object.keys(dropped_ships)).forEach(ship_id=>{
+            cell_index_arr = dropped_ships[ship_id].drop_cell_index     
+            if (cell_index_arr.length ==0) {
+                con_ready = false
+                return
+            }
+        })
+        if (con_ready) {
+            player_ready = true
+            player_ready_label.innerText = 'Ready'
+            player_ready_label.style.color = '#45a049';
+
+            lock_board()
+
+            socket.emit('ready-up',room_id)
+            if(opponent_ready_label.innerText == 'Ready' && player_ready_label.innerText == 'Ready'){
+                socket.emit('both-player-ready',[room_id,dropped_ships])
+            }
+        }else{
+            warning_bar.innerText = 'Ships-remaining'
+            warning_bar.style.display = 'block'
         }
-    })
-    if (con_ready) {
-        player_ready_label.innerText = 'Ready'
-        player_ready_label.style.color = '#45a049'
-        socket.emit('ready-up',room_id)
-    }else{
-        warning_bar.innerText = 'Ships-remaining'
-        warning_bar.style.display = 'block'
+    }
+    else{
+        player_ready = false;
+        player_ready_label.innerText = 'Not-Ready';
+        player_ready_label.style.color = '#ff4d4d';
+        unlock_board()
+       
     }
 
 }
-
 
 
 //----------------------------------------------------------------------------
