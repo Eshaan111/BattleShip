@@ -96,7 +96,7 @@ function enter_room_create(){
     socketio.on('change-to-game',data=>{
       // data = [room_id,opponent_exists,opponent_name]
       var room_id = data[0]
-      window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}` //then socket.emit('create-room') in script.js
+      window.location.href=`index.html?room=${room_id}&name=${name_input_box.value}&opponentName=invalid` //then socket.emit('create-room') in script.js
     })
     
     

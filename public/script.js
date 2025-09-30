@@ -38,8 +38,8 @@ const opponent_name_display = document.getElementById('opponent_name_label')
 const shipPane = document.getElementById("ship-pane");                      // Ship placement area
 
 // Initialize player name displays
-player_name_display.innerText = player_name
-opponent_name_display.innerText = opponent_name
+player_name_display.innerText = player_name;
+(opponent_name=='invalid')?opponent_name_display.innerText = opponent_name : opponent_name_display.innerText = '<Opponent-Not-Joined>'
 
 //----------------------------------------------------------------------------
 // GAME BOARD CONFIGURATION
