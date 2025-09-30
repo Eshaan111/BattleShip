@@ -33,6 +33,7 @@ const your_board = document.getElementById('your-board')                     // 
 client_cells = document.getElementsByClassName('cell-your-board')           // Your attack grid
 opponent_cells = document.getElementsByClassName(`cell-opponent-board`)     // Enemy's grid to attack
 warning_bar = document.getElementById('warning_bar')                        // Status messages
+const player_ready_label = document.getElementById('player-ready-status')
 const player_name_display = document.getElementById('player_name_label')
 const opponent_name_display = document.getElementById('opponent_name_label')
 const shipPane = document.getElementById("ship-pane");                      // Ship placement area
@@ -157,7 +158,7 @@ const shipContainer5 = document.getElementById("ship-5");
 ships = {}
 // Structure: ships = { shipContainer : {shipIndexes : [[a,b],[c,d]], shipCellDivs : [div1,div2,div3] } }
 
-dropped_ships = {
+let dropped_ships = {
   'ship1': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix1},
   'ship2': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix2},
   'ship3': {drop_cell_index : [], drop_cell_divs: [], ship_matrix: shipMatrix2},
@@ -482,7 +483,26 @@ makeShipDraggable('unplaced', 'ship4', shipContainer4, shipMatrix4, dropped_ship
 makeShipDraggable('unplaced', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
 
 
+function playerReadyUp(){
+    warning_bar.style.display = 'none'
+    let con_ready = true;
+    Array.from(Object.keys(dropped_ships)).forEach(ship_id=>{
+        cell_index_arr = dropped_ships[ship_id].drop_cell_index     
+        console.log(cell_index_arr)
+        if (cell_index_arr.length ==0) {
+            con_ready = false
+            return
+        }
+    })
+    if (con_ready) {
+        player_ready_label.innerText = 'Ready'
+        player_ready_label.style.color = '#45a049'
+    }else{
+        warning_bar.innerText = 'Ships-remaining'
+        warning_bar.style.display = 'block'
+    }
 
+} 
 
 
 //----------------------------------------------------------------------------

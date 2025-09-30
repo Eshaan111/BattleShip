@@ -65,7 +65,7 @@ header h1 {
   align-items: flex-start;
   gap: 2vw;              /* spacing between ship pane and boards */
   margin-top: 2vh;
-  height: 80vh;          /* consistent height for everything */
+  height: 84vh;          /* consistent height for everything */
   width: 90vw;           /* fit nicely within screen */
   margin-left: auto;
   margin-right: auto;
