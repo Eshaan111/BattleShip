@@ -155,7 +155,7 @@ header h1 {
     font-weight: 300; /* Thin font weight */
     font-style: italic; /* Italic text */
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.501px;
     margin: 0;
     padding: 0;
     border: none;
