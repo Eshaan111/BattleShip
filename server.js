@@ -157,6 +157,7 @@ io.on('connect', socket => {
             }
         });
         socket.emit('get-opponent-grid', players[opponent_id].cell_grid)
+        io.to(opponent_id).emit('get-opponent-grid', players[socket.id].cell_grid)
         console.log(`sending to ${socket.id} grid of ${opponent_id}, grid = `, cell_grid)
 
     })
