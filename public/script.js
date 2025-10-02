@@ -49,6 +49,7 @@ player_name_display.innerText = player_name;
 
 // Board dimensions (15x15 - larger than traditional 10x10 Battleship)
 const row = 15;
+
 const col = 15;
 
 // 2D array to track game state: occupied cells and ship ownership

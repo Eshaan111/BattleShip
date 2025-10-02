@@ -4,14 +4,25 @@ const app = express()
 const expressServer = app.listen(4000)
 const io = socketio(expressServer, {})
 
-players = {
+let players = {
     // socket_id : {playerName : <player name>, playerNum : <player's number>, room_id= <room id joined>, is_turn = 0/1,
-    //              cell_grid = 2d Array , 
-    // Structure: cellGrid[row][col] = { occupied: true/false, shipId: X }
+    //              cell_grid = 2d Array , dropped_indexes= {shipid : [indexes]}
+    // Structure: cellGrid[row][col] = { occupied: true/false, shipId: X, }
 }
 app.use(express.static('public'))
 
-
+function log_players() {
+    abc = {}
+    Array.from(Object.keys(players)).forEach(key => {
+        abc[key] = {}
+        abc[key].playerName = players[key].playerName
+        abc[key].playerNum = players[key].playerNum
+        abc[key].room_id = players[key].room_id
+        abc[key].is_turn = players[key].is_turn
+        abc[key].dropped_indexes = players[key].dropped_indexes
+    });
+    console.log(abc, "\nCAUTION :: player[key].cell_grid is not shown here ")
+}
 io.on('connect', socket => {
 
 
@@ -48,7 +59,7 @@ io.on('connect', socket => {
         socket.join(room_id)
         player_count = Object.keys(players).length
         players[socket.id] = { playerName: player_name, playerNum: player_count + 1, room_id: room_id, is_turn: turn, cell_grid: null }
-        console.log(players)
+        // console.log(players)
     })
 
     ///JOINING ROOM///
@@ -117,12 +128,12 @@ io.on('connect', socket => {
                     players[opponent_id].is_turn = 1;
                 }
             }
-            console.log('turn-eval-true')
+            // console.log('turn-eval-true')
             socket.emit('turn-evaluation', true)
             return
         }
         else {
-            console.log('turn-eval-false')
+            // console.log('turn-eval-false')
             socket.emit('turn-evaluation', false)
             return
         }
@@ -142,8 +153,23 @@ io.on('connect', socket => {
         });
         io.to(opponent_id).emit('opponent-ready', room_id)
         players[socket.id].cell_grid = cell_grid;
-        // console.log('received grid = ', cell_grid)
-        console.log(`emitting ready-up to ${opponent_id}`)
+
+        players[socket.id].dropped_indexes = {}
+        for (let i = 0; i < 15; i++) {
+            for (let j = 0; j < 15; j++) {
+                cell_obj = cell_grid[i][j]
+                if (cell_obj.occupied == true) {
+                    // console.log(cell_obj, cell_obj.shipId)
+                    if (!players[socket.id].dropped_indexes[cell_obj.shipId]) {
+                        players[socket.id].dropped_indexes[cell_obj.shipId] = []
+                    }
+                    dropped_index_arr = players[socket.id].dropped_indexes[cell_obj.shipId]
+                    dropped_index_arr[dropped_index_arr.length] = (15 * i) + j
+                }
+            }
+        }
+        console.log(`$Player {players[socket.id].playerName} is ready, emitting opponent-ready to ${opponent_id}`)
+        log_players()
 
     })
 
@@ -158,18 +184,20 @@ io.on('connect', socket => {
         });
         socket.emit('get-opponent-grid', players[opponent_id].cell_grid)
         io.to(opponent_id).emit('get-opponent-grid', players[socket.id].cell_grid)
-        console.log(`sending to ${socket.id} grid of ${opponent_id}, grid = `, cell_grid)
+        console.log("------------------BOTH PLAYERS READY -------------------------")
+        log_players()
+
 
     })
 
 
     socket.on('print-players', room_id => {
-        console.log(players)
+        // console.log(players)
     })
 
     socket.on('disconnect', () => {
         delete players[socket.id]
-        console.log(`deleteing player ${socket.id}`, players)
+        // console.log(`deleteing player ${socket.id}`, players)
     })
 
 
