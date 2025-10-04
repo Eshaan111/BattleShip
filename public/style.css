@@ -309,6 +309,21 @@ header h1 {
     transition: background 0.3s;
 }
 
+.connection-status {
+    display : none;
+    margin-top: 15px;
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    background: #ff4d4d;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background 0.3s;
+}
+
 .ready-status.opponent-ready {
     background: #4CAF50;
 }

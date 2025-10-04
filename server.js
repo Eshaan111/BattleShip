@@ -248,6 +248,25 @@ io.on('connect', socket => {
 
     })
 
+    socket.on('player-unready', roomIid => {
+        console.log(`${socket.id} is unready now`)
+        both_ready = true
+        let opponent_id
+        Array.from(Object.keys(players)).forEach(id => {
+            if (players[socket.id].room_id == players[id].room_id && id != socket.id) {
+                opponent_id = id
+                return
+            }
+        });
+        if (players[socket.id].cell_grid == null || players[opponent_id].cell_grid == null) {
+            io.to(opponent_id).emit('opponent-unready', opponent_id)
+            console.log(`telling ${opponent_id} that ${socket.id} is unready`)
+            players[socket.id].dropped_indexes = {}
+            players[socket.id].cell_grid = null;
+
+        }
+    })
+
     socket.on('req-opponent-grid', ([room_id, cell_grid]) => {
         let opponent_id;
         Array.from(Object.keys(players)).forEach(curr_socket_id => {
@@ -268,12 +287,24 @@ io.on('connect', socket => {
 
 
     socket.on('print-players', room_id => {
-        // console.log(players)
+        console.log(players)
     })
 
     socket.on('disconnect', () => {
-        delete players[socket.id]
-        // console.log(`deleteing player ${socket.id}`, players)
+        let opponent_id
+        if (players[socket.id]) {
+            Array.from(Object.keys(players)).forEach(id => {
+                if (players[socket.id].room_id == players[id].room_id && id != socket.id) {
+                    opponent_id = id
+                    return
+                }
+            });
+            console.log(`emmiting to ${opponent_id} that ${socket.id} dc-ed`)
+            io.to(opponent_id).emit('opponent-disconnect', socket.id)
+            delete players[socket.id]
+            console.log(`deleteing player ${socket.id}`, players)
+
+        }
     })
 
 

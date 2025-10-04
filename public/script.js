@@ -37,11 +37,20 @@ const player_ready_label = document.getElementById('player-ready-status')
 const opponent_ready_label = document.getElementById('opponent-ready-status')
 const player_name_display = document.getElementById('player_name_label')
 const opponent_name_display = document.getElementById('opponent_name_label')
+const opponent_connection_label = document.getElementById('opponent_connection_status')
 const shipPane = document.getElementById("ship-pane");                      // Ship placement area
 
 // Initialize player name displays
 player_name_display.innerText = player_name;
 (opponent_name == 'invalid') ? opponent_name_display.innerText = '<Opponent-Not-Joined>' : opponent_name_display.innerText = opponent_name
+
+if (opponent_name == 'invalid') {
+    opponent_name_display.innerText = '<Opponent-Not-Joined>'
+    opponent_connection_label.style.display = 'block'
+}
+else {
+    opponent_name_display.innerText = opponent_name;
+}
 
 //----------------------------------------------------------------------------
 // GAME BOARD CONFIGURATION
@@ -511,13 +520,22 @@ function playerReadyUp() {
 
         warning_bar.style.display = 'none'
         let con_ready = true;
+        let warning_mesg;
+
         Array.from(Object.keys(dropped_ships)).forEach(ship_id => {
             cell_index_arr = dropped_ships[ship_id].drop_cell_index
             if (cell_index_arr.length == 0) {
-                // con_ready = false
+                con_ready = false
+                warning_mesg = 'Ships-remaining'
                 return
             }
         })
+
+        if (opponent_name_display.innerText == '<OPPONENT-NOT-JOINED>') {
+            con_ready = false
+            warning_mesg = 'No opponent'
+        }
+
         if (con_ready) {
             player_ready = true
             player_ready_label.innerText = 'Ready'
@@ -535,15 +553,16 @@ function playerReadyUp() {
 
             }
         } else {
-            warning_bar.innerText = 'Ships-remaining'
+            warning_bar.innerText = warning_mesg
             warning_bar.style.display = 'block'
         }
     }
-    else {
+    else if (opp_cell_grid.length == 0) {
         player_ready = false;
         player_ready_label.innerText = 'Not-Ready';
         player_ready_label.style.color = '#ff4d4d';
         unlock_board()
+        socket.emit('player-unready', room_id)
 
     }
 
@@ -557,8 +576,9 @@ function handle_got_cell_clicked(index, class_to_add) {
     cell_clicked = cell_grid[grid_row][grid_col]
     console.log('cell_Clicked = ', cell_clicked)
     console.log(client_cells[index])
-    if (!cell_clicked.occupied) {
+    if (!cell_clicked.attacked) {
         client_cells[index].classList.add(class_to_add)
+        console.log(`ship at row${grid_row} col${grid_col} was changed`)
     }
 
 }
@@ -569,10 +589,10 @@ function handle_got_cell_clicked(index, class_to_add) {
 //----------------------------------------------------------------------------
 
 socket.on('get-opponent-grid', grid => {
-    console.log('recieved opponent grid', grid)
+    // console.log('recieved opponent grid', grid)
     opp_cell_grid = grid
     document.getElementById('opponent-board').innerHTML = ''
-    console.log(opp_cell_grid)
+    // console.log(opp_cell_grid)
     build_board('opponent-board', opp_cell_grid)
 
 })
@@ -594,6 +614,7 @@ socket.on('player-alone', bool => {
 // Opponent connection notification
 socket.on('oppponent joined', name => {
     opponent_name_display.innerText = name
+    opponent_connection_label.style.display = 'none'
 })
 
 socket.on('opponent-ready', room_id => {
@@ -601,6 +622,13 @@ socket.on('opponent-ready', room_id => {
     opponent_ready_label.style.color = '#45a049'
 })
 // Turn validation and attack processing
+//
+socket.on('opponent-unready', room_id => {
+    console.log('aithe ', opponent_ready_label)
+    opponent_ready_label.innerText = 'not ready'
+    opponent_ready_label.style.color = '#ff4d4d'
+})
+
 socket.on('turn-evaluation', (bool, class_to_add) => {
     if (!bool) {
         // Not player's turn - show warning
@@ -615,6 +643,24 @@ socket.on('turn-evaluation', (bool, class_to_add) => {
             socket.emit('print-players', room_id);
         }
     }
+})
+
+socket.on('opponent-disconnect', opp_id => {
+    console.log(`${opp_id} disconnected `)
+    opponent_connection_label.style.display = 'block'
+    opponent_ready_label.innertext = 'not ready'
+    opponent_ready_label.style.color = '#ff4d4d'
+    opponent_name_display.innerText = '<OPPONENT-NOT-JOINED>'
+    document.getElementById('opponent-board').innerHTML = ''
+    build_board('opponent-board')
+
+    player_ready = false;
+    player_ready_label.innerText = 'Not-Ready';
+    player_ready_label.style.color = '#ff4d4d';
+    unlock_board()
+    socket.emit('player-unready', room_id)
+
+    opp_cell_grid = []
 })
 
 //----------------------------------------------------------------------------
