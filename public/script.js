@@ -39,6 +39,9 @@ const player_name_display = document.getElementById('player_name_label')
 const opponent_name_display = document.getElementById('opponent_name_label')
 const opponent_connection_label = document.getElementById('opponent_connection_status')
 const shipPane = document.getElementById("ship-pane");                      // Ship placement area
+const ready_button = document.getElementById('ready_button');
+const opp_turn_label = document.getElementById('opp-turn-label')
+const my_turn_label = document.getElementById('my-turn-label')
 
 // Initialize player name displays
 player_name_display.innerText = player_name;
@@ -550,7 +553,7 @@ function playerReadyUp() {
             if (opponent_ready_label.innerText == 'READY' && player_ready_label.innerText == 'READY') {
                 console.log('both player ready')
                 socket.emit('req-opponent-grid', [room_id, cell_grid])
-
+                ready_button.style.display = 'none'
             }
         } else {
             warning_bar.innerText = warning_mesg
@@ -628,6 +631,21 @@ socket.on('opponent-unready', room_id => {
     opponent_ready_label.innerText = 'not ready'
     opponent_ready_label.style.color = '#ff4d4d'
 })
+
+socket.on('my-turn', bool => {
+    ready_button.style.display = 'none'
+    opp_turn_label.style.display = 'none';
+    my_turn_label.style.display = 'block';
+
+})
+
+socket.on('opp-turn', bool => {
+    ready_button.style.display = 'none'
+    my_turn_label.style.display = 'none';
+    opp_turn_label.style.display = 'block';
+
+})
+
 
 socket.on('turn-evaluation', (bool, class_to_add) => {
     if (!bool) {

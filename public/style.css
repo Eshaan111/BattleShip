@@ -294,6 +294,37 @@ header h1 {
     background: #1976D2;
 }
 
+.my-turn-label{
+    display : none;
+    margin-top: 5px;
+    padding: 12px 24px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+}
+
+.opp-turn-label{
+    display : none;
+    margin-top: 5px;
+    padding: 12px 24px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+}
 /* Ready status label styling */
 .ready-status {
     margin-top: 15px;

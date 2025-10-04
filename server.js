@@ -58,33 +58,6 @@ function type_of_attack(attacked_on_id, index) {
         return type_cell
     }
 
-    return
-
-
-    // dropped_index_obj_key.forEach(index => {
-    //     console.log('HUHUHUHUHUHHU')
-    //     dropped_index_arr = dropped_index_obj[shipId]
-    //     // console.log(dropped_index_arr[0], index, dropped_index_arr[0] == ([index, false]))
-    //     for (let arr of dropped_index_arr) {
-    //         console.log(arr, index)
-    //         if (!dropped_index_arr.includes([index, true]) && !dropped_index_arr.includes([index, false]) && arr[0] != index && arr[1] == false) {
-    //             type_cell = 'clicked_blank_cell';
-    //             console.log('clicked a blank cell');
-    //             arr[1] = true;
-    //             break;
-    //         }
-    //         else if (arr[0] == index && arr[1] == false) {
-    //             type_cell = 'destroyed_ship_cell';
-    //             console.log('clciked a ship-cell');
-    //             arr[1] = true;
-    //             break;
-    //         }
-    //         else { console.log('tf bro') }
-    //     }
-    // });
-    //
-    // return type_cell
-
 }
 
 
@@ -195,19 +168,20 @@ io.on('connect', socket => {
 
         if (client_turn == 1) {
             let class_to_add = type_of_attack(opponent_id, index)
-
+            let opp_id;
             for (let id in players) {
-                console.log('my id = ', client_room_id)
                 if (players[id].room_id == client_room_id && id !== socket.id) {
                     //updating opponent client's CLIENT BOARD
-                    io.to(id).emit('opponent_clicked_cell', index, class_to_add)
-                    opponent_id = id;
+                    opp_id = id
+                    io.to(opp_id).emit('opponent_clicked_cell', index, class_to_add)
                     players[socket.id].is_turn = 0;
-                    players[opponent_id].is_turn = 1;
+                    players[opp_id].is_turn = 1;
                 }
             }
             // console.log('turn-eval-true')
             socket.emit('turn-evaluation', true, class_to_add)
+            socket.emit('opp-turn', true)
+            io.to(opp_id).emit('my-turn', true)
             return
         }
         else {
@@ -248,7 +222,7 @@ io.on('connect', socket => {
 
     })
 
-    socket.on('player-unready', roomIid => {
+    socket.on('player-unready', roomId => {
         console.log(`${socket.id} is unready now`)
         both_ready = true
         let opponent_id
@@ -268,18 +242,28 @@ io.on('connect', socket => {
     })
 
     socket.on('req-opponent-grid', ([room_id, cell_grid]) => {
+
+        console.log("------------------BOTH PLAYERS READY -------------------------")
+
         let opponent_id;
         Array.from(Object.keys(players)).forEach(curr_socket_id => {
             iter_room_id = players[curr_socket_id].room_id
             if (iter_room_id == room_id && curr_socket_id != socket.id) {
                 opponent_id = curr_socket_id
-                return
             }
+            if (players[curr_socket_id].room_id == players[socket.id].room_id && players[curr_socket_id].is_turn == 1) {
+                io.to(curr_socket_id).emit('my-turn', true)
+            }
+            if (players[curr_socket_id].room_id == players[socket.id].room_id && players[curr_socket_id].is_turn == 0) {
+                io.to(curr_socket_id).emit('opp-turn', true)
+            }
+
         });
         socket.emit('get-opponent-grid', players[opponent_id].cell_grid)
         io.to(opponent_id).emit('get-opponent-grid', players[socket.id].cell_grid)
-        console.log("------------------BOTH PLAYERS READY -------------------------")
         log_players()
+
+
 
 
 
