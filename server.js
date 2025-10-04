@@ -6,8 +6,9 @@ const io = socketio(expressServer, {})
 
 let players = {
     // socket_id : {playerName : <player name>, playerNum : <player's number>, room_id= <room id joined>, is_turn = 0/1,
-    //              cell_grid = 2d Array , dropped_indexes= {shipid : [indexes]}
-    // Structure: cellGrid[row][col] = { occupied: true/false, shipId: X, }
+    //              cell_grid = 2d Array , dropped_indexes= {index : [shipId, attacked(t/f)] } 
+    //  Structure: cellGrid[row][col] = { occupied: true/false, shipId: X, attacked : true/false
+    // }
 }
 app.use(express.static('public'))
 
@@ -23,6 +24,74 @@ function log_players() {
     });
     console.log(abc, "\nCAUTION :: player[key].cell_grid is not shown here ")
 }
+
+function type_of_attack(attacked_on_id, index) {
+    let type_cell;
+    row = parseInt(index / 15)
+    col = index % 15
+
+
+    console.log('reaching attack eval')
+    console.log('HUHUHUHUHUHUHUHUH', attacked_on_id)
+    console.log(players)
+    dropped_index_obj = players[attacked_on_id].dropped_indexes
+    dropped_index_obj_key = Array.from(Object.keys(dropped_index_obj))
+    index_is_ship_cell = Array.from(Object.keys(dropped_index_obj).includes(`${index}`))
+
+    // cell_grid = players[socket.id].cell_grid
+    // cell = cell_grid[row][col]
+    //
+    console.log('dropped_index_obj[`${index}` != undefined] = ', dropped_index_obj[`${index}`] != undefined)
+    if (dropped_index_obj[`${index}`] != undefined) {
+        type_cell = 'destroyed_ship_cell';
+        console.log(`clciked a ship-cell(${index}) on `, players[attacked_on_id].playerName);
+        console.log(dropped_index_obj[`${index}`]);
+        // dropped_index_obj[`${index}`][1] = true;
+        // cell.attacked = true
+        return type_cell
+    }
+
+    else {
+        type_cell = 'clicked_blank_cell';
+        console.log(`clicked a blank cell(${index}) on `, players[attacked_on_id].playerName);
+        // cell.attacked = true
+        return type_cell
+    }
+
+    return
+
+
+    // dropped_index_obj_key.forEach(index => {
+    //     console.log('HUHUHUHUHUHHU')
+    //     dropped_index_arr = dropped_index_obj[shipId]
+    //     // console.log(dropped_index_arr[0], index, dropped_index_arr[0] == ([index, false]))
+    //     for (let arr of dropped_index_arr) {
+    //         console.log(arr, index)
+    //         if (!dropped_index_arr.includes([index, true]) && !dropped_index_arr.includes([index, false]) && arr[0] != index && arr[1] == false) {
+    //             type_cell = 'clicked_blank_cell';
+    //             console.log('clicked a blank cell');
+    //             arr[1] = true;
+    //             break;
+    //         }
+    //         else if (arr[0] == index && arr[1] == false) {
+    //             type_cell = 'destroyed_ship_cell';
+    //             console.log('clciked a ship-cell');
+    //             arr[1] = true;
+    //             break;
+    //         }
+    //         else { console.log('tf bro') }
+    //     }
+    // });
+    //
+    // return type_cell
+
+}
+
+
+
+
+
+
 io.on('connect', socket => {
 
 
@@ -45,6 +114,7 @@ io.on('connect', socket => {
         console.log('changing to game')
         socket.emit('change-to-game', [room_id, 0, ''])
     })
+
     socket.on('enter-room', data => {
         //data = [player_name,room_id]
         const room_id = data[1]
@@ -62,7 +132,9 @@ io.on('connect', socket => {
         // console.log(players)
     })
 
+
     ///JOINING ROOM///
+
     socket.on('join-room-req', data => {
         var room_id = data[0]
         var name = data[1]
@@ -96,12 +168,16 @@ io.on('connect', socket => {
 
         var client_room_id = players[socket.id].room_id
         var client_turn = players[socket.id].is_turn
-        var opponent_id = ''
+        var opponent_id = '';
         //checking number of players in room
         var room_player_count = 0;
-        for (id in players) {
+        console.log('ARE HAN YAHA TO POHOCH RHA HU ')
+
+        Array.from(Object.keys(players)).forEach(id => {
             if (players[id].room_id == client_room_id) { room_player_count++ }
-        }
+            if (players[id].room_id == client_room_id && id != socket.id) { opponent_id = id }
+
+        });
 
         //check if opponent connected 
 
@@ -118,23 +194,25 @@ io.on('connect', socket => {
         //checking turn
 
         if (client_turn == 1) {
+            let class_to_add = type_of_attack(opponent_id, index)
+
             for (let id in players) {
                 console.log('my id = ', client_room_id)
                 if (players[id].room_id == client_room_id && id !== socket.id) {
                     //updating opponent client's CLIENT BOARD
-                    io.to(id).emit('opponent_clicked_cell', index)
+                    io.to(id).emit('opponent_clicked_cell', index, class_to_add)
                     opponent_id = id;
                     players[socket.id].is_turn = 0;
                     players[opponent_id].is_turn = 1;
                 }
             }
             // console.log('turn-eval-true')
-            socket.emit('turn-evaluation', true)
+            socket.emit('turn-evaluation', true, class_to_add)
             return
         }
         else {
             // console.log('turn-eval-false')
-            socket.emit('turn-evaluation', false)
+            socket.emit('turn-evaluation', false, null)
             return
         }
 
@@ -154,21 +232,18 @@ io.on('connect', socket => {
         io.to(opponent_id).emit('opponent-ready', room_id)
         players[socket.id].cell_grid = cell_grid;
 
-        players[socket.id].dropped_indexes = {}
+        if (!players[socket.id].dropped_indexes) players[socket.id].dropped_indexes = {}
         for (let i = 0; i < 15; i++) {
             for (let j = 0; j < 15; j++) {
                 cell_obj = cell_grid[i][j]
                 if (cell_obj.occupied == true) {
                     // console.log(cell_obj, cell_obj.shipId)
-                    if (!players[socket.id].dropped_indexes[cell_obj.shipId]) {
-                        players[socket.id].dropped_indexes[cell_obj.shipId] = []
-                    }
-                    dropped_index_arr = players[socket.id].dropped_indexes[cell_obj.shipId]
-                    dropped_index_arr[dropped_index_arr.length] = (15 * i) + j
+                    index = (15 * i) + j
+                    players[socket.id].dropped_indexes[index] = [cell_obj.shipId, false]
                 }
             }
         }
-        console.log(`$Player {players[socket.id].playerName} is ready, emitting opponent-ready to ${opponent_id}`)
+        console.log(`Player ${players[socket.id].playerName} is ready, emitting opponent-ready to ${opponent_id}`)
         log_players()
 
     })
@@ -186,6 +261,7 @@ io.on('connect', socket => {
         io.to(opponent_id).emit('get-opponent-grid', players[socket.id].cell_grid)
         console.log("------------------BOTH PLAYERS READY -------------------------")
         log_players()
+
 
 
     })

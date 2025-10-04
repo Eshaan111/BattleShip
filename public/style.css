@@ -222,6 +222,24 @@ header h1 {
 }
 
 
+.clicked_blank_cell {
+  background-color: white;  /* or any color you want */
+  border: 2px solid darkred;
+}
+
+.clicked_blank_cell:hover {
+  background-color: white;  /* keep same color */
+}
+
+.destroyed_ship_cell {
+  background-color: yellow;  /* or any color you want */
+  border: 2px solid darkred;
+}
+
+.destroyed_ship_cell:hover {
+  background-color: yellow;  /* keep same color */
+}
+
 
 .warning_bar {
   display: none;

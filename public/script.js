@@ -49,13 +49,12 @@ player_name_display.innerText = player_name;
 
 // Board dimensions (15x15 - larger than traditional 10x10 Battleship)
 const row = 15;
-
 const col = 15;
 
 // 2D array to track game state: occupied cells and ship ownership
 let cell_grid = []
 let opp_cell_grid = []
-// Structure: cellGrid[row][col] = { occupied: true/false, shipId: X }
+// Structure: cellGrid[row][col] = { occupied: true/false, shipId: X, attacked : true/false }
 
 //----------------------------------------------------------------------------
 // DYNAMIC BOARD GENERATION
@@ -69,7 +68,7 @@ function build_board(board_name, grid_to_map = null) {
         for (var j = 0; j < col; j++) {
             // Initialize cell state (fixed typo: shipId instead of shidId)
             if (!grid_to_map) {
-                cell_grid[i][j] = { occupied: false, shipId: null }
+                cell_grid[i][j] = { occupied: false, shipId: null, attacked: false }
             }
             else {
                 cell_grid[i][j] = grid_to_map[i][j]
@@ -80,8 +79,7 @@ function build_board(board_name, grid_to_map = null) {
             var parent = document.getElementById(board_name)
             cell.classList.add('cell')
             cell.classList.add(`cell-${board_name}`);
-            if (grid_to_map) { console.log(grid_to_map, grid_to_map[i][j]) }
-            if (grid_to_map && grid_to_map[i][j].occupied == true) { cell.style.background = 'red' }
+            if (grid_to_map && grid_to_map[i][j].occupied == true) { cell.classList.add('clicked_cell') }
 
             // Linear indexing: convert 2D coordinates to single index (15*i + j)
             // This simplifies coordinate calculations throughout the game
@@ -93,7 +91,8 @@ function build_board(board_name, grid_to_map = null) {
                 warning_bar.style.display = 'none'
 
                 // Prevent clicking same cell twice
-                if (Array.from(this.classList).includes('clicked_cell')) {
+                class_arr = Array.from(this.classList)
+                if (class_arr.includes('destroyed_ship_cell') || class_arr.includes('clicked_blank_cell')) {
                     return
                 }
 
@@ -251,7 +250,7 @@ var render_output5 = render_ship(shipContainer5, shipMatrix5, 'ship-cell')
 ships['ship5'] = { shipIndexes: render_output5[0], shipCellDivs: render_output5[1] }
 
 
-console.log(ships)
+// console.log(ships)
 
 // Initialize ship in palette
 
@@ -433,7 +432,7 @@ function makeShipDraggable(type_of_cell, ship_id, ship_container = null, shipMat
                 // Clear old cell_grid data when moving a placed ship
                 if (type_of_cell === "placed") {
                     ship_cell_indexes.forEach(([old_index, old_row, old_col]) => {
-                        cell_grid[old_row][old_col] = { occupied: false, shipId: null };
+                        cell_grid[old_row][old_col] = { occupied: false, shipId: null, attacked: false };
                         // Remove drag handlers from old cells
                         let old_cell = Array.from(client_cells)[old_index];
                         if (old_cell && old_cell._dragHandler) {
@@ -455,7 +454,7 @@ function makeShipDraggable(type_of_cell, ship_id, ship_container = null, shipMat
                 });
                 if (valid_place) {
                     arr_dropped_index.forEach(([new_index, r, c]) => {
-                        cell_grid[r][c] = { occupied: true, shipId: ship_id };
+                        cell_grid[r][c] = { occupied: true, shipId: ship_id, attacked: false };
                         let cell_placed = Array.from(client_cells)[new_index];
                         cell_placed.classList.remove("cell");
                         cell_placed.classList.add("ship-placed-cell");
@@ -495,7 +494,6 @@ makeShipDraggable('unplaced', 'ship3', shipContainer3, shipMatrix3, dropped_ship
 makeShipDraggable('unplaced', 'ship4', shipContainer4, shipMatrix4, dropped_ships)
 makeShipDraggable('unplaced', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
 
-
 function unlock_board() {
 
     makeShipDraggable('placed', 'ship1', shipContainer1, shipMatrix1, dropped_ships)
@@ -505,11 +503,8 @@ function unlock_board() {
     makeShipDraggable('placed', 'ship5', shipContainer5, shipMatrix5, dropped_ships)
 }
 
-
 // Initialize dragging for unplaced ships4
 const ship_cells = Array.from(document.getElementsByClassName('ship-cell'));
-
-
 let player_ready = false;
 function playerReadyUp() {
     if (player_ready == false) {
@@ -554,6 +549,20 @@ function playerReadyUp() {
 
 }
 
+function handle_got_cell_clicked(index, class_to_add) {
+    console.log('reaching handler')
+    let grid_row = parseInt(index / 15);
+    let grid_col = index % 15;
+    // console.log(cell_grid)
+    cell_clicked = cell_grid[grid_row][grid_col]
+    console.log('cell_Clicked = ', cell_clicked)
+    console.log(client_cells[index])
+    if (!cell_clicked.occupied) {
+        client_cells[index].classList.add(class_to_add)
+    }
+
+}
+
 
 //----------------------------------------------------------------------------
 // SOCKET EVENT HANDLERS - REAL-TIME GAME STATE
@@ -569,9 +578,9 @@ socket.on('get-opponent-grid', grid => {
 })
 
 // Handle opponent's attacks on your board
-socket.on('opponent_clicked_cell', index => {
+socket.on('opponent_clicked_cell', (index, class_to_add) => {
     // Visual feedback when opponent attacks your cells
-    client_cells[index].classList.add('clicked_cell')
+    handle_got_cell_clicked(index, class_to_add)
 })
 
 // Connection status monitoring
@@ -592,7 +601,7 @@ socket.on('opponent-ready', room_id => {
     opponent_ready_label.style.color = '#45a049'
 })
 // Turn validation and attack processing
-socket.on('turn-evaluation', bool => {
+socket.on('turn-evaluation', (bool, class_to_add) => {
     if (!bool) {
         // Not player's turn - show warning
         warning_bar.innerText = 'NOT YOUR TURN';
@@ -601,7 +610,8 @@ socket.on('turn-evaluation', bool => {
         // Valid turn - process attack
         if (window.lastClickedCell) {
             // Update opponent board on your screen when you attack
-            window.lastClickedCell.classList.add('clicked_cell');
+            window.lastClickedCell.classList.remove('cell')
+            window.lastClickedCell.classList.add(class_to_add);
             socket.emit('print-players', room_id);
         }
     }
