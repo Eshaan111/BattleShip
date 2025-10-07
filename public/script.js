@@ -31,7 +31,6 @@ const opponent_name = params.get('opponentName')
 // Game boards and UI elements
 const your_board = document.getElementById('your-board')                     // Player's defensive board
 client_cells = document.getElementsByClassName('cell-your-board')           // Your attack grid
-opponent_cells = document.getElementsByClassName(`cell-opponent-board`)     // Enemy's grid to attack
 warning_bar = document.getElementById('warning_bar')                        // Status messages
 const player_ready_label = document.getElementById('player-ready-status')
 const opponent_ready_label = document.getElementById('opponent-ready-status')
@@ -83,7 +82,7 @@ function build_board(board_name, grid_to_map = null) {
                 cell_grid[i][j] = { occupied: false, shipId: null, attacked: false }
             }
             else {
-                cell_grid[i][j] = grid_to_map[i][j]
+                opp_cell_grid[i][j] = grid_to_map[i][j]
             }
 
             // Create DOM cell element
@@ -104,7 +103,7 @@ function build_board(board_name, grid_to_map = null) {
 
                 // Prevent clicking same cell twice
                 class_arr = Array.from(this.classList)
-                if (class_arr.includes('destroyed_ship_cell') || class_arr.includes('clicked_blank_cell')) {
+                if (class_arr.includes('destroyed_ship_cell') || class_arr.includes('clicked_blank_cell') || class_arr.includes('attacked_ship_cell')) {
                     return
                 }
 
@@ -528,7 +527,7 @@ function playerReadyUp() {
         Array.from(Object.keys(dropped_ships)).forEach(ship_id => {
             cell_index_arr = dropped_ships[ship_id].drop_cell_index
             if (cell_index_arr.length == 0) {
-                con_ready = false
+                // con_ready = false
                 warning_mesg = 'Ships-remaining'
                 return
             }
@@ -658,10 +657,53 @@ socket.on('turn-evaluation', (bool, class_to_add) => {
             // Update opponent board on your screen when you attack
             window.lastClickedCell.classList.remove('cell')
             window.lastClickedCell.classList.add(class_to_add);
-            socket.emit('print-players', room_id);
+            if (class_to_add == 'destroyed_ship_cell') {
+                index = window
+            }
+
+
+            // socket.emit('print-players', room_id);
         }
     }
 })
+
+socket.on('ship-got-destroyed', (board, index) => {
+    /// board = whose ship got destroyed 
+    console.log(`ship-destroyed of ${board}, index = `, index)
+    let grid;
+    let cells_arr;
+    if (board == 'own') {
+        grid = cell_grid
+        cells_arr = document.getElementsByClassName('cell-your-board')
+    }
+    else {
+        grid = opp_cell_grid
+        cells_arr = document.getElementsByClassName('cell-opponent-board')
+    }
+
+    let attack_row = parseInt(parseInt(index) / 15)
+    let attack_col = index % 15
+    let ship_id = grid[attack_row][attack_col].shipId
+    console.log('board_choosed = ', cells_arr)
+    console.log('cell =', grid[attack_row][attack_col])
+    console.log('ship id = ', ship_id)
+
+    for (let i = 0; i < 15; i++) {
+        for (let j = 0; j < 15; j++) {
+            if (grid[i][j].shipId == ship_id) {
+                let curr_index = (15 * i) + j;
+                let cell = cells_arr[curr_index]
+                cell.classList.remove('cell')
+                cell.classList.remove('clicked_cell')
+                cell.classList.remove('attacked_ship_cell')
+                cell.classList.add('destroyed_ship_cell')
+            }
+        }
+    }
+
+
+})
+
 
 socket.on('opponent-disconnect', opp_id => {
     console.log(`${opp_id} disconnected `)

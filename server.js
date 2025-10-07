@@ -33,7 +33,7 @@ function type_of_attack(attacked_on_id, index) {
 
     console.log('reaching attack eval')
     console.log('HUHUHUHUHUHUHUHUH', attacked_on_id)
-    console.log(players)
+    // console.log(players)
     dropped_index_obj = players[attacked_on_id].dropped_indexes
     dropped_index_obj_key = Array.from(Object.keys(dropped_index_obj))
     index_is_ship_cell = Array.from(Object.keys(dropped_index_obj).includes(`${index}`))
@@ -41,12 +41,28 @@ function type_of_attack(attacked_on_id, index) {
     // cell_grid = players[socket.id].cell_grid
     // cell = cell_grid[row][col]
     //
-    console.log('dropped_index_obj[`${index}` != undefined] = ', dropped_index_obj[`${index}`] != undefined)
     if (dropped_index_obj[`${index}`] != undefined) {
-        type_cell = 'destroyed_ship_cell';
-        console.log(`clciked a ship-cell(${index}) on `, players[attacked_on_id].playerName);
+        let attacked_ship_id = dropped_index_obj[`${index}`][0]
+        let ship_destroyed = true
+
+        console.log(`YAHA and Attacked ship-id = `, attacked_ship_id)
+        dropped_index_obj[`${index}`][1] = true;
+
+        Array.from(Object.keys(dropped_index_obj)).forEach(key_index => {
+            key = `${key_index}`
+            ship_id = dropped_index_obj[key][0]
+            ship_attacked = dropped_index_obj[key][1]
+            console.log(`curr_attacked = ${ship_attacked} `)
+            if (ship_id == attacked_ship_id && ship_attacked == false) {
+                ship_destroyed = false
+            }
+        });
+
+        if (ship_destroyed) {
+            type_cell = 'destroyed_ship_cell'
+        }
+        else { type_cell = 'attacked_ship_cell'; }
         console.log(dropped_index_obj[`${index}`]);
-        // dropped_index_obj[`${index}`][1] = true;
         // cell.attacked = true
         return type_cell
     }
@@ -107,7 +123,6 @@ io.on('connect', socket => {
 
 
     ///JOINING ROOM///
-
     socket.on('join-room-req', data => {
         var room_id = data[0]
         var name = data[1]
@@ -169,11 +184,16 @@ io.on('connect', socket => {
         if (client_turn == 1) {
             let class_to_add = type_of_attack(opponent_id, index)
             let opp_id;
+
+
+
             for (let id in players) {
                 if (players[id].room_id == client_room_id && id !== socket.id) {
                     //updating opponent client's CLIENT BOARD
                     opp_id = id
                     io.to(opp_id).emit('opponent_clicked_cell', index, class_to_add)
+                    console.log(`emitting opponent clicked type-cell = ${class_to_add} to ${opp_id}`)
+
                     players[socket.id].is_turn = 0;
                     players[opp_id].is_turn = 1;
                 }
@@ -182,6 +202,12 @@ io.on('connect', socket => {
             socket.emit('turn-evaluation', true, class_to_add)
             socket.emit('opp-turn', true)
             io.to(opp_id).emit('my-turn', true)
+
+            if (class_to_add == 'destroyed_ship_cell') {
+                socket.emit('ship-got-destroyed', 'opp', index)
+                io.to(opp_id).emit('ship-got-destroyed', 'own', index)
+            }
+            console.log(`emitting clicked type-cell = ${class_to_add} to ${socket.id}`)
             return
         }
         else {
