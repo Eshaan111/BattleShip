@@ -6,7 +6,7 @@ const io = socketio(expressServer, {})
 
 let players = {
     // socket_id : {playerName : <player name>, playerNum : <player's number>, room_id= <room id joined>, is_turn = 0/1,
-    //              cell_grid = 2d Array , dropped_indexes= {index : [shipId, attacked(t/f)] } 
+    //              cell_grid = 2d Array , dropped_indexes= {index : [shipId, attacked(t/f)] }, ship_destroyed : int 
     //  Structure: cellGrid[row][col] = { occupied: true/false, shipId: X, attacked : true/false
     // }
 }
@@ -117,7 +117,7 @@ io.on('connect', socket => {
 
         socket.join(room_id)
         player_count = Object.keys(players).length
-        players[socket.id] = { playerName: player_name, playerNum: player_count + 1, room_id: room_id, is_turn: turn, cell_grid: null }
+        players[socket.id] = { playerName: player_name, playerNum: player_count + 1, room_id: room_id, is_turn: turn, cell_grid: null, ship_destroyed: 0 }
         // console.log(players)
     })
 
@@ -206,6 +206,16 @@ io.on('connect', socket => {
             if (class_to_add == 'destroyed_ship_cell') {
                 socket.emit('ship-got-destroyed', 'opp', index)
                 io.to(opp_id).emit('ship-got-destroyed', 'own', index)
+
+                players[socket.id].ship_destroyed = players[socket.id].ship_destroyed + 1
+                console.log(players[socket.id])
+                if (players[socket.id].ship_destroyed == 1) {
+                    console.log('won = ', socket.id)
+                    socket.emit('player-won', players[socket.id].room_id)
+                    io.to(opp_id).emit('opponent-won', players[socket.id].room_id)
+                }
+
+
             }
             console.log(`emitting clicked type-cell = ${class_to_add} to ${socket.id}`)
             return

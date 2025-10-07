@@ -72,7 +72,7 @@ let opp_cell_grid = []
 //----------------------------------------------------------------------------
 
 // Creates interactive game board with click handlers
-function build_board(board_name, grid_to_map = null) {
+function build_board(board_name, grid_to_map = null, game_end = null) {
     // console.log(`parameter grid = ${grid_to_map}`)
     for (var i = 0; i < row; i++) {
         if (!grid_to_map) { cell_grid[i] = [] }
@@ -91,6 +91,8 @@ function build_board(board_name, grid_to_map = null) {
             cell.classList.add('cell')
             cell.classList.add(`cell-${board_name}`);
             if (grid_to_map && grid_to_map[i][j].occupied == true) { cell.classList.add('clicked_cell') }
+            if (game_end == 1 && grid_to_map[i][j] == 1) { cell.classList.remove('cell'); cell.classList.add('ship-cell') }
+            if (game_end == 0 && grid_to_map[i][j] == 1) { cell.classList.remove('cell'); cell.classList.add('attacked_ship_cell') }
 
             // Linear indexing: convert 2D coordinates to single index (15*i + j)
             // This simplifies coordinate calculations throughout the game
@@ -171,6 +173,46 @@ let shipMatrix5 = [
     [0, 1, 1, 1],
     [1, 1, 1, 1]
 ];
+
+
+let winMatrix = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0],
+    [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0],
+    [0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0],
+    [0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0],
+    [0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+
+
+let loseMatrix = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+    [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0],
+    [1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0],
+    [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0],
+    [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+
+
 const shipContainer1 = document.getElementById("ship-1");
 const shipContainer2 = document.getElementById("ship-2");
 const shipContainer3 = document.getElementById("ship-3");
@@ -704,6 +746,25 @@ socket.on('ship-got-destroyed', (board, index) => {
 
 })
 
+socket.on('player-won', room_id => {
+    console.log('I WON ')
+    document.getElementById('your-board').innerHTML = ''
+    document.getElementById('opponent-board').innerHTML = ''
+
+    build_board('your-board', winMatrix, 1)      // Defensive board (your ships)
+    build_board('opponent-board', loseMatrix, 0)  // Offensive board (attack enemy)
+    lock_board()
+})
+
+socket.on('opponent-won', room_id => {
+    console.log('OPPONENET WON ')
+    document.getElementById('your-board').innerHTML = ''
+    document.getElementById('opponent-board').innerHTML = ''
+
+    build_board('your-board', loseMatrix, 0)      // Defensive board (your ships)
+    build_board('opponent-board', winMatrix, 1)  // Offensive board (attack enemy)
+    lock_board()
+})
 
 socket.on('opponent-disconnect', opp_id => {
     console.log(`${opp_id} disconnected `)
