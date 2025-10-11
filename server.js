@@ -11,6 +11,10 @@ let players = {
     //  Structure: cellGrid[row][col] = { occupied: true/false, shipId: X, attacked : true/false
     // }
 }
+app.get('/', (req, res) => {
+    console.log('aithe', __dirname)
+    res.sendFile(__dirname + '/public/matchmaking.html')
+})
 app.use(express.static('public'))
 
 function log_players() {
