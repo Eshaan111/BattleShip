@@ -9,7 +9,8 @@
 //----------------------------------------------------------------------------
 
 // Establish WebSocket connection to game server
-const socket = io('http://localhost:4000')
+const socket = io()
+// const socket = io('http://localhost:4000')
 
 // Initial handshake to confirm connection
 socket.emit('confirm', 'JS says this')
