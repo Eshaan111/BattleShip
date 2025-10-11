@@ -253,6 +253,7 @@ io.on('connect', socket => {
                 }
             }
         }
+        console.log(players[socket.id].cell_grid)
         console.log(`Player ${players[socket.id].playerName} is ready, emitting opponent-ready to ${opponent_id}`)
         log_players()
 
@@ -268,13 +269,12 @@ io.on('connect', socket => {
                 return
             }
         });
-        if (players[socket.id].cell_grid == null || players[opponent_id].cell_grid == null) {
+        if (opponent_id && (players[socket.id].cell_grid == null || players[opponent_id].cell_grid == null)) {
             io.to(opponent_id).emit('opponent-unready', opponent_id)
             console.log(`telling ${opponent_id} that ${socket.id} is unready`)
-            players[socket.id].dropped_indexes = {}
-            players[socket.id].cell_grid = null;
-
         }
+        players[socket.id].dropped_indexes = {}
+        players[socket.id].cell_grid = null;
     })
 
     socket.on('req-opponent-grid', ([room_id, cell_grid]) => {

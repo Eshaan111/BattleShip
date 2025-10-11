@@ -75,11 +75,18 @@ let opp_cell_grid = []
 function build_board(board_name, grid_to_map = null, game_end = null) {
     // console.log(`parameter grid = ${grid_to_map}`)
     for (var i = 0; i < row; i++) {
-        if (!grid_to_map) { cell_grid[i] = [] }
+        if (!grid_to_map) {
+            (board_name == 'your-board') ? cell_grid[i] = [] : opp_cell_grid[i] = []
+        }
         for (var j = 0; j < col; j++) {
             // Initialize cell state (fixed typo: shipId instead of shidId)
             if (!grid_to_map) {
-                cell_grid[i][j] = { occupied: false, shipId: null, attacked: false }
+                if (board_name == 'your-board') {
+                    cell_grid[i][j] = { occupied: false, shipId: null, attacked: false }
+                }
+                else {
+                    opp_cell_grid[i][j] = { occupied: false, shipId: null, attacked: false }
+                }
             }
             else {
                 opp_cell_grid[i][j] = grid_to_map[i][j]
@@ -174,6 +181,24 @@ let shipMatrix5 = [
     [1, 1, 1, 1]
 ];
 
+let emptyMatrix = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+
+]
 
 let winMatrix = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -586,7 +611,7 @@ function playerReadyUp() {
             player_ready_label.style.color = '#45a049';
 
             lock_board()
-            // console.log(cell_grid)
+            console.log('here', cell_grid)
 
             socket.emit('ready-up', room_id, cell_grid)
 
