@@ -1,7 +1,8 @@
 const express = require('express')
 const socketio = require('socket.io')
 const app = express()
-const expressServer = app.listen(4000)
+const port = process.env.PORT || 4000
+const expressServer = app.listen(port)
 const io = socketio(expressServer, {})
 
 let players = {
