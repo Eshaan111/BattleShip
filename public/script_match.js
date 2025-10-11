@@ -1,6 +1,6 @@
 // const socketio = io('http://localhost:4000')
 
-const socket = io()
+const socketio = io()
 
 const row = 15;
 const col = 15;
