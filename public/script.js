@@ -31,8 +31,8 @@ const opponent_name = params.get('opponentName')
 
 // Game boards and UI elements
 const your_board = document.getElementById('your-board')                     // Player's defensive board
-client_cells = document.getElementsByClassName('cell-your-board')           // Your attack grid
-warning_bar = document.getElementById('warning_bar')                        // Status messages
+const client_cells = document.getElementsByClassName('cell-your-board')           // Your attack grid
+const warning_bar = document.getElementById('warning_bar')                        // Status messages
 const player_ready_label = document.getElementById('player-ready-status')
 const opponent_ready_label = document.getElementById('opponent-ready-status')
 const player_name_display = document.getElementById('player_name_label')
@@ -595,7 +595,7 @@ function playerReadyUp() {
         Array.from(Object.keys(dropped_ships)).forEach(ship_id => {
             cell_index_arr = dropped_ships[ship_id].drop_cell_index
             if (cell_index_arr.length == 0) {
-                // con_ready = false
+                con_ready = false
                 warning_mesg = 'Ships-remaining'
                 return
             }
