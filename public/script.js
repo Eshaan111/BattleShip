@@ -700,16 +700,35 @@ socket.on('opponent-unready', room_id => {
 })
 
 socket.on('my-turn', bool => {
-    ready_button.style.display = 'none'
-    opp_turn_label.style.display = 'none';
-    my_turn_label.style.display = 'block';
+    if (bool) {
+        ready_button.style.display = 'none'
+        opp_turn_label.innerText = 'Opponent Picking Ship'
+        opp_turn_label.style.display = 'none';
+        my_turn_label.innerText = 'Attack A Ship'
+        my_turn_label.style.display = 'block';
+    }
 
 })
 
 socket.on('opp-turn', bool => {
-    ready_button.style.display = 'none'
-    my_turn_label.style.display = 'none';
-    opp_turn_label.style.display = 'block';
+    if (bool) {
+        ready_button.style.display = 'none'
+        my_turn_label.innerText = 'Attack A Ship'
+        my_turn_label.style.display = 'none';
+        opp_turn_label.innerText = 'Opponent Picking Ship'
+        opp_turn_label.style.display = 'block';
+    }
+
+})
+
+socket.on('extra-turn', bool => {
+    if (bool) {
+        ready_button.style.display = 'none'
+        opp_turn_label.innerText = 'Opponent Picking Ship'
+        opp_turn_label.style.display = 'none';
+        my_turn_label.innerText = 'Correct Guess, Take Another Go'
+        my_turn_label.style.display = 'block';
+    }
 
 })
 

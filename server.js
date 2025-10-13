@@ -187,15 +187,27 @@ io.on('connect', socket => {
                     opp_id = id
                     io.to(opp_id).emit('opponent_clicked_cell', index, class_to_add)
                     console.log(`Turn processed`, { attacker: socket.id, defender: opp_id, cellIndex: index, attackType: class_to_add })
+                    if (class_to_add == 'destroyed_ship_cell' || class_to_add == "attacked_ship_cell") {
+                        players[socket.id].is_turn = 1;
+                        players[opp_id].is_turn = 0;
+                        socket.emit('turn-evaluation', true, class_to_add)
+                        socket.emit('my-turn', true)
+                        socket.emit('extra-turn', true)
+                        socket.emit('opp-turn', false)
+                        io.to(opp_id).emit('my-turn', false)
+                    }
+                    else {
+                        players[socket.id].is_turn = 0;
+                        players[opp_id].is_turn = 1;
+                        socket.emit('turn-evaluation', true, class_to_add)
+                        socket.emit('my-turn', false)
+                        socket.emit('opp-turn', true)
+                        io.to(opp_id).emit('my-turn', true)
 
-                    players[socket.id].is_turn = 0;
-                    players[opp_id].is_turn = 1;
+                    }
                 }
             }
 
-            socket.emit('turn-evaluation', true, class_to_add)
-            socket.emit('opp-turn', true)
-            io.to(opp_id).emit('my-turn', true)
 
             if (class_to_add == 'destroyed_ship_cell') {
                 socket.emit('ship-got-destroyed', 'opp', index)

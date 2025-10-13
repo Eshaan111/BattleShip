@@ -128,7 +128,7 @@ function enter_room_join() {
         join_enter_button.style.display = 'none'
         name_input_box.style.display = 'none'
         message_bar.style.background = "#f44336"
-        message_para.innerText = `Room <${room_id}> doesnt exist`
+        message_para.innerText = `Room "${room_id}" doesnt exist, Try Creating Room`
         message_bar.style.display = 'flex';
         return
     })
@@ -137,7 +137,7 @@ function enter_room_join() {
         join_enter_button.style.display = 'none'
         name_input_box.style.display = 'none'
         message_bar.style.background = "#f44336"
-        message_para.innerText = `Room <${room_id}> Full, Cant Join`
+        message_para.innerText = `Room "${room_id}" Full, Try A different Name`
         message_bar.style.display = 'flex';
     })
     //confiramtion
