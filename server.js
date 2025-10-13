@@ -204,7 +204,7 @@ io.on('connect', socket => {
                 players[socket.id].ship_destroyed = players[socket.id].ship_destroyed + 1
                 console.log(`Ship destroyed count updated`, { socketId: socket.id, destroyedShips: players[socket.id].ship_destroyed })
 
-                if (players[socket.id].ship_destroyed == 1) {
+                if (players[socket.id].ship_destroyed == 5) {
                     console.log(`Game won`, { winner: socket.id, winnerName: players[socket.id].playerName, roomId: client_room_id })
                     socket.emit('player-won', players[socket.id].room_id)
                     io.to(opp_id).emit('opponent-won', players[socket.id].room_id)

@@ -98,9 +98,9 @@ function build_board(board_name, grid_to_map = null, game_end = null) {
             var parent = document.getElementById(board_name)
             cell.classList.add('cell')
             cell.classList.add(`cell-${board_name}`);
-            if (grid_to_map && grid_to_map[i][j].occupied == true) { cell.classList.add('clicked_cell') }
-            if (game_end == 1 && grid_to_map[i][j] == 1) { cell.classList.remove('cell'); cell.classList.add('ship-cell') }
-            if (game_end == 0 && grid_to_map[i][j] == 1) { cell.classList.remove('cell'); cell.classList.add('attacked_ship_cell') }
+            // if (grid_to_map && grid_to_map[i][j].occupied == true) { cell.classList.add('clicked_cell') }
+            if (game_end == 1 && grid_to_map[i][j] == 1) { cell.classList.remove('cell'); cell.classList.add('attacked_ship_cell') }
+            if (game_end == 0 && grid_to_map[i][j] == 1) { cell.classList.remove('cell'); cell.classList.add('clicked_cell') }
 
             // Linear indexing: convert 2D coordinates to single index (15*i + j)
             // This simplifies coordinate calculations throughout the game
