@@ -53,6 +53,29 @@
 
     <div class="warning_bar" id="warning_bar">Warning messages appear here</div>
 
+  <!-- Chat Icon (fixed) -->
+  <div id="chat-icon" class="chat-icon" onclick = 'toggleChat()'>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
+         xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z
+               M20 16H5.17L4 17.17V4H20V16Z"/>
+    </svg>
+  </div>
+
+  <!-- Chat Pane (hidden by default) -->
+  <div id="chat-pane" class="chat-pane">
+    <div id="chat-header" class="chat-header">
+      <span>Game Chat</span>
+      <button id="chat-close" class="chat-close" onclick = 'toggleChat()'>×</button>
+    </div>
+    <div id="chat-body" class="chat-body">
+      <!-- Messages injected here -->
+    </div>
+    <div id="chat-input-container" class="chat-input-container">
+      <input id="chat-input" class="chat-input" type="text" placeholder="Type a message…">
+      <button id="chat-send" class="chat-send" onclick = 'send_chat()'>Send</button>
+    </div>
+  </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>

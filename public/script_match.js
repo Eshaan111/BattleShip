@@ -79,6 +79,17 @@ function enter_room_create() {
         message_bar.style.display = 'flex';
         return
     }
+
+    if (name_input_box.value == '') {
+        create_enter_button.style.display = 'none'
+        join_enter_button.style.display = 'none'
+        name_input_box.style.display = 'none'
+        message_bar.style.background = "#f44336"
+        message_para.innerText = 'Please Enter A Name!'
+        message_bar.style.display = 'flex';
+        return
+
+    }
     console.log(room_id)
     id_input_box.value = '';
 
@@ -116,6 +127,16 @@ function enter_room_join() {
         message_para.innerText = 'Please Enter Valid ID!'
         message_bar.style.display = 'flex';
         return
+    }
+    if (name_input_box.value == '') {
+        create_enter_button.style.display = 'none'
+        join_enter_button.style.display = 'none'
+        name_input_box.style.display = 'none'
+        message_bar.style.background = "#f44336"
+        message_para.innerText = 'Please Enter A Name!'
+        message_bar.style.display = 'flex';
+        return
+
     }
     console.log(room_id)
     id_input_box.value = '';

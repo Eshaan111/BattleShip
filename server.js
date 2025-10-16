@@ -307,6 +307,20 @@ io.on('connect', socket => {
         log_players()
     })
 
+    socket.on('sent-mesg', mesg => {
+        let opp_id;
+        let room_id = players[socket.id].room_id
+        Array.from(Object.keys(players)).forEach(curr_socket_id => {
+            let iter_room_id = players[curr_socket_id].room_id
+            if (iter_room_id == room_id && curr_socket_id != socket.id) {
+                opp_id = curr_socket_id
+                return
+            }
+        });
+        io.to(opp_id).emit('recieved-mesg', mesg)
+
+    })
+
     socket.on('print-players', room_id => {
         console.log('Player list request:', players)
     })

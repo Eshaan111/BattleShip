@@ -42,7 +42,12 @@ const shipPane = document.getElementById("ship-pane");                      // S
 const ready_button = document.getElementById('ready_button');
 const opp_turn_label = document.getElementById('opp-turn-label')
 const my_turn_label = document.getElementById('my-turn-label')
-
+const chat_close_btn = document.getElementById('chat-close')
+const chat_icon = document.getElementById('chat-icon')
+const chat_pane = document.getElementById('chat-pane')
+const chat_input = document.getElementById('chat-input')
+const chat_send_btn = document.getElementById('chat-send')
+const chat_body = document.getElementById('chat-body')
 // Initialize player name displays
 player_name_display.innerText = player_name;
 (opponent_name == 'invalid') ? opponent_name_display.innerText = '<Opponent-Not-Joined>' : opponent_name_display.innerText = opponent_name
@@ -653,6 +658,36 @@ function handle_got_cell_clicked(index, class_to_add) {
 
 }
 
+function toggleChat() {
+    if (chat_pane.style.display == 'flex') {
+        chat_pane.style.display = 'none';
+        return
+    } else {
+        chat_pane.style.display = 'flex'
+    }
+}
+
+function send_chat() {
+    val = chat_input.value
+    if (val == '') {
+        return
+    }
+    if (opponent_name == 'invalid') {
+        warning_bar.innerText = 'OPPONENT NOT CONNECTED'
+        warning_bar.style.display = 'block'
+        chat_input.value = ''
+        return
+    }
+    text = `${val}`
+    mesg = document.createElement('div')
+    mesg.classList.add('chat-message', 'own')
+    mesg.innerText = text;
+    chat_body.appendChild(mesg)
+    chat_input.value = ''
+    warning_bar.style.display = 'none'
+
+    socket.emit('sent-mesg', text)
+}
 
 //----------------------------------------------------------------------------
 // SOCKET EVENT HANDLERS - REAL-TIME GAME STATE
@@ -685,6 +720,7 @@ socket.on('player-alone', bool => {
 socket.on('oppponent joined', name => {
     opponent_name_display.innerText = name
     opponent_connection_label.style.display = 'none'
+    warning_bar.style.display = 'none'
 })
 
 socket.on('opponent-ready', room_id => {
@@ -789,6 +825,14 @@ socket.on('ship-got-destroyed', (board, index) => {
     }
 
 
+})
+
+socket.on('recieved-mesg', mesg => {
+    text = `${mesg}`
+    mesg = document.createElement('div')
+    mesg.classList.add('chat-message', 'oher')
+    mesg.innerText = text;
+    chat_body.appendChild(mesg)
 })
 
 socket.on('player-won', room_id => {
