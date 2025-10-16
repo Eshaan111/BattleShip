@@ -1150,6 +1150,22 @@ header h1 {
     box-shadow: var(--shadow-md), 0 0 15px var(--glow-red);
 }
 
+.notification_bar {
+    display: none;
+    margin-top: var(--space-16);
+    padding: var(--space-10) var(--space-16);
+    text-align: center;
+    font-size: var(--font-size-lg);
+    border-radius: var(--radius-base);
+    background: linear-gradient(45deg, #F18F01, #ff8f00); /* Amber instead of yellow */
+    border: 1px solid var(--accent-red);
+    color: var(--color-white);
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: var(--shadow-md), 0 0 15px var(--glow-red);
+}
+
 @media (max-width: 480px) {
     .warning_bar {
         font-size: var(--font-size-base);

@@ -48,6 +48,7 @@ const chat_pane = document.getElementById('chat-pane')
 const chat_input = document.getElementById('chat-input')
 const chat_send_btn = document.getElementById('chat-send')
 const chat_body = document.getElementById('chat-body')
+const notification_bar = document.getElementById('notification_bar')
 // Initialize player name displays
 player_name_display.innerText = player_name;
 (opponent_name == 'invalid') ? opponent_name_display.innerText = '<Opponent-Not-Joined>' : opponent_name_display.innerText = opponent_name
@@ -665,6 +666,7 @@ function toggleChat() {
     } else {
         chat_pane.style.display = 'flex'
     }
+    notification_bar.style.display = 'none'
 }
 
 function send_chat() {
@@ -834,6 +836,12 @@ socket.on('recieved-mesg', mesg => {
     mesg.classList.add('chat-message', 'oher')
     mesg.innerText = text;
     chat_body.appendChild(mesg)
+
+    if (chat_pane.style.display == 'none' || chat_pane.style.display == '') {
+        notification_bar.style.display = 'block'
+    }
+
+
 })
 
 socket.on('player-won', room_id => {
