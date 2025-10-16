@@ -23,7 +23,7 @@ socket.on('confirm1', data => {
 const params = new URLSearchParams(window.location.search);
 const room_id = params.get('room')
 const player_name = params.get('name')
-const opponent_name = params.get('opponentName')
+opponent_name = params.get('opponentName')
 
 //----------------------------------------------------------------------------
 // DOM ELEMENT REFERENCES
@@ -718,6 +718,7 @@ socket.on('player-alone', bool => {
 
 // Opponent connection notification
 socket.on('oppponent joined', name => {
+    opponent_name = name;
     opponent_name_display.innerText = name
     opponent_connection_label.style.display = 'none'
     warning_bar.style.display = 'none'
